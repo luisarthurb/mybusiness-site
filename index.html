@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>mybusiness · Skills de IA e mini-cursos</title>
+  <meta name="description" content="Newsletter semanal com usos práticos de IA para o seu negócio, mais skills de IA e mini-cursos. Grátis.">
+  <meta name="theme-color" content="#ffffff">
+  <link rel="icon" type="image/png" href="img/logo-arco.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip" href="#vitrine">Pular para a vitrine</a>
+
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="#topo" aria-label="mybusiness, início">
+        <span class="wordmark">MYBUSINESS</span>
+      </a>
+      <nav aria-label="Principal">
+        <a class="nav-link" href="#vitrine">Vitrine</a>
+        <a class="nav-link insta-link" href="#" rel="noopener">Instagram</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="topo">
+    <!-- HERO -->
+    <section class="hero">
+      <div class="wrap hero-grid">
+       <div class="hero-inner">
+        <p class="eyebrow">Newsletter semanal · Skills de IA · Mini-cursos</p>
+        <h1>IA que trabalha pro seu negócio. <span class="accent">Pronta pra usar.</span></h1>
+        <p class="lede">Toda semana, um email curto: um jeito prático de usar IA no seu negócio e um pedido pronto pra copiar. Grátis.</p>
+        <div class="hero-form" id="hero-form"></div>
+        <div class="hero-status" role="note">
+          <span class="pulse" aria-hidden="true"></span>
+          <span><strong>Skills e mini-cursos em produção.</strong> Assinante fica sabendo primeiro. <a href="#vitrine">Ver o que vem aí</a></span>
+        </div>
+       </div>
+        <picture class="hero-logo">
+          <source type="image/webp" srcset="img/logo-arco.webp">
+          <img src="img/logo-arco.png" alt="MYBUSINESS" width="848" height="504" fetchpriority="high">
+        </picture>
+      </div>
+    </section>
+
+    <!-- VITRINE -->
+    <section class="showcase" id="vitrine" aria-labelledby="vitrine-title">
+      <div class="wrap">
+        <div class="showcase-head">
+          <p class="eyebrow">Vitrine</p>
+          <h2 id="vitrine-title">Escolha o que vai trabalhar por você</h2>
+        </div>
+
+        <div class="chips" role="tablist" aria-label="Categorias" id="chips"></div>
+        <div class="thumbs" id="thumbs" aria-label="Produtos da categoria"></div>
+
+        <article class="detail" id="detail" aria-labelledby="d-title">
+          <div class="preview" id="d-preview"></div>
+
+          <div class="info">
+            <p class="d-meta">
+              <span id="d-type"></span>
+              <span class="pill" id="d-status"></span>
+            </p>
+            <h3 id="d-title"></h3>
+            <p class="d-desc" id="d-desc"></p>
+
+            <dl class="rows" id="d-rows"></dl>
+
+            <div class="action" id="d-action"></div>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-inner">
+      <span>© <span id="year"></span> mybusiness</span>
+      <a class="insta-link" href="#" rel="noopener">Instagram</a>
+    </div>
+  </footer>
+
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

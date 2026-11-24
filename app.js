@@ -1,0 +1,289 @@
+(function () {
+  "use strict";
+  var C = window.CONFIG;
+  var $ = function (id) { return document.getElementById(id); };
+  var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+  var state = { cat: null, id: null };
+  var byCat = function (cat) { return C.PRODUCTS.filter(function (p) { return p.category === cat; }); };
+  var typeLabel = function (p) { return p.category === "cursos" ? "Mini-curso" : "Skill de IA"; };
+  var isLive = function (p) { return !!(p.checkoutUrl && p.price); };
+
+  function el(tag, cls, text) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text != null) n.textContent = text;
+    return n;
+  }
+
+  // Capa: imagem se houver; senão capa da marca (skill = vermelha, mini-curso = branca).
+  function cover(p) {
+    var c = el("div", "cover " + (p.category === "cursos" ? "cover-cursos" : "cover-skills"));
+    if (p.cover) {
+      var img = el("img");
+      img.src = p.cover; img.alt = ""; img.loading = "lazy"; img.decoding = "async";
+      c.append(img);
+    } else {
+      c.append(el("span", "cover-title", p.title));
+    }
+    return c;
+  }
+
+  // ---------- Categorias (abas) ----------
+  function renderChips() {
+    var wrap = $("chips");
+    wrap.textContent = "";
+    C.CATEGORIES.forEach(function (cat) {
+      var n = byCat(cat.id).length;
+      if (!n) return;
+      var b = el("button", "chip");
+      b.type = "button";
+      b.setAttribute("role", "tab");
+      b.id = "tab-" + cat.id;
+      b.setAttribute("aria-controls", "thumbs");
+      b.setAttribute("aria-selected", String(cat.id === state.cat));
+      b.tabIndex = cat.id === state.cat ? 0 : -1;
+      b.append(document.createTextNode(cat.label + " "), el("span", "count", String(n)));
+      b.addEventListener("click", function () { selectCat(cat.id); });
+      wrap.append(b);
+    });
+  }
+
+  // Setas esquerda/direita entre as abas (padrão WAI-ARIA).
+  $("chips").addEventListener("keydown", function (e) {
+    var tabs = Array.prototype.slice.call(this.querySelectorAll('[role="tab"]'));
+    var i = tabs.indexOf(document.activeElement);
+    if (i < 0) return;
+    var next = null;
+    if (e.key === "ArrowRight") next = tabs[(i + 1) % tabs.length];
+    if (e.key === "ArrowLeft") next = tabs[(i - 1 + tabs.length) % tabs.length];
+    if (e.key === "Home") next = tabs[0];
+    if (e.key === "End") next = tabs[tabs.length - 1];
+    if (!next) return;
+    e.preventDefault();
+    next.click();
+    $(next.id).focus();
+  });
+
+  function selectCat(cat) {
+    state.cat = cat;
+    var list = byCat(cat);
+    if (!list.some(function (p) { return p.id === state.id; })) state.id = list[0] && list[0].id;
+    renderChips();
+    $("thumbs").setAttribute("aria-labelledby", "tab-" + cat);
+    renderThumbs();
+    renderDetail();
+  }
+
+  // ---------- Miniaturas ----------
+  function renderThumbs() {
+    var wrap = $("thumbs");
+    wrap.textContent = "";
+    byCat(state.cat).forEach(function (p) {
+      var b = el("button", "thumb");
+      b.type = "button";
+      b.setAttribute("aria-pressed", String(p.id === state.id));
+      b.setAttribute("aria-controls", "detail");
+      b.setAttribute("aria-label", p.title);
+      b.append(cover(p));
+      b.addEventListener("click", function () {
+        state.id = p.id;
+        renderThumbs();
+        renderDetail();
+        wrap.querySelector('[aria-pressed="true"]').focus();
+      });
+      wrap.append(b);
+    });
+  }
+
+  // ---------- Detalhe ----------
+  function row(label, valueNode) {
+    var r = el("div", "row");
+    var dd = el("dd");
+    dd.append(valueNode);
+    r.append(el("dt", null, label), dd);
+    return r;
+  }
+
+  function copyBtn(text) {
+    var b = el("button", "copy-btn", "Copiar");
+    b.type = "button";
+    b.setAttribute("aria-label", "Copiar o pedido de exemplo");
+    b.addEventListener("click", function () {
+      var ok = function () { b.textContent = "Copiado ✓"; setTimeout(function () { b.textContent = "Copiar"; }, 1800); };
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(ok, function () { fallbackCopy(text); ok(); });
+      } else { fallbackCopy(text); ok(); }
+    });
+    return b;
+  }
+  function fallbackCopy(text) {
+    var t = el("textarea"); t.value = text; t.setAttribute("readonly", "");
+    t.style.position = "absolute"; t.style.left = "-9999px";
+    document.body.append(t); t.select();
+    try { document.execCommand("copy"); } catch (e) { /* sem suporte */ }
+    t.remove();
+  }
+
+  function renderDetail() {
+    var p = C.PRODUCTS.find(function (x) { return x.id === state.id; });
+    if (!p) return;
+    var live = isLive(p);
+
+    var pv = $("d-preview");
+    pv.textContent = "";
+    pv.classList.toggle("has-media", !!p.cover);
+    pv.append(el("span", "preview-label", live ? "Disponível" : "Prévia"), cover(p));
+
+    $("d-type").textContent = typeLabel(p);
+    var st = $("d-status");
+    st.textContent = live ? "Disponível" : "Em breve";
+    st.classList.toggle("is-live", live);
+    $("d-title").textContent = p.title;
+    $("d-desc").textContent = p.desc;
+
+    var rows = $("d-rows");
+    rows.textContent = "";
+    if (p.fit) rows.append(row("Bom pra", document.createTextNode(p.fit)));
+    if (p.prompt) {
+      var f = document.createDocumentFragment();
+      f.append(document.createTextNode("“" + p.prompt + "”"), copyBtn(p.prompt));
+      rows.append(row("Como pedir", f));
+    }
+    if (p.format) rows.append(row("Formato", document.createTextNode(p.format)));
+
+    renderAction(p, live);
+  }
+
+  // ---------- Ação: comprar ou entrar na lista ----------
+  function renderAction(p, live) {
+    var box = $("d-action");
+    box.textContent = "";
+
+    if (live) {
+      var price = el("p", "price", p.price);
+      var sub = el("p", "action-sub", "Pagamento único · acesso enviado por email após a compra");
+      var buy = el("a", "btn btn-primary", "Comprar agora");
+      buy.href = p.checkoutUrl;
+      buy.rel = "noopener";
+      box.append(price, sub, buy);
+      return;
+    }
+
+    box.append(
+      el("p", "action-title", "Quer esse? Assine e seja avisado."),
+      el("p", "action-sub", "Quem assina a newsletter fica sabendo primeiro, antes de abrir pra todo mundo.")
+    );
+    box.append(subscribeForm({
+      id: "f-" + p.id,
+      interest: p.id,
+      button: "Me avise",
+      done: "Pronto. Você vai saber primeiro quando “" + p.title + "” sair."
+    }));
+  }
+
+  // ---------- Formulário de inscrição (topo e produtos usam o mesmo) ----------
+  // Grava no Supabase (mypan2) pela função subscribe_mybusiness_newsletter.
+  // A chave publicável é pública por natureza; a tabela não pode ser lida pela API.
+  function subscribeForm(o) {
+    var form = el("form", "wait-form");
+    form.noValidate = true;
+
+    var label = el("label", "hp", "Seu email"); // visível só para leitores de tela
+    label.htmlFor = o.id + "-email";
+
+    var rowEl = el("div", "wait-row");
+    var input = el("input");
+    input.type = "email"; input.id = o.id + "-email"; input.name = "email";
+    input.autocomplete = "email"; input.inputMode = "email"; input.required = true;
+    input.placeholder = "seu@email.com";
+    input.setAttribute("aria-describedby", o.id + "-msg");
+    var btn = el("button", "btn btn-primary", o.button);
+    btn.type = "submit";
+    rowEl.append(input, btn);
+
+    // Consentimento pelo clique: o texto fica junto do botão, sem caixa de marcar.
+    var consentText = el("p", "consent",
+      "Ao assinar, você aceita receber a newsletter semanal da mybusiness. Sai quando quiser, pelo link em todo email.");
+    consentText.id = o.id + "-consent";
+    btn.setAttribute("aria-describedby", consentText.id);
+
+    // Campo isca: humanos não veem, robôs preenchem.
+    var hp = el("input", "hp");
+    hp.type = "text"; hp.name = "website"; hp.tabIndex = -1; hp.autocomplete = "off";
+    hp.setAttribute("aria-hidden", "true");
+
+    var msg = el("p", "msg");
+    msg.id = o.id + "-msg";
+    msg.setAttribute("role", "status");
+
+    form.append(label, rowEl, consentText, hp, msg);
+
+    var say = function (t, isErr) { msg.textContent = t; msg.classList.toggle("err", !!isErr); };
+    var success = function () {
+      var done = el("p", "done", o.done);
+      done.setAttribute("role", "status");
+      form.replaceWith(done);
+    };
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      say("");
+      input.removeAttribute("aria-invalid");
+      if (hp.value) { success(); return; }
+
+      var email = input.value.trim();
+      if (!EMAIL_RE.test(email)) {
+        input.setAttribute("aria-invalid", "true");
+        say("Confira o email: parece incompleto.", true);
+        input.focus();
+        return;
+      }
+      if (!C.SUPABASE_URL || !C.SUPABASE_PUBLISHABLE_KEY) {
+        say("Página em configuração: o destino dos emails ainda não foi definido.", true);
+        return;
+      }
+
+      var payload = { email: email, consent: true };
+      if (o.interest) payload.interest = o.interest;
+
+      btn.disabled = true;
+      btn.textContent = "Enviando…";
+      fetch(C.SUPABASE_URL + "/rest/v1/rpc/subscribe_mybusiness_newsletter", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "apikey": C.SUPABASE_PUBLISHABLE_KEY,
+          "Content-Profile": "mypan"
+        },
+        body: JSON.stringify({ p_response: payload })
+      }).then(function (res) {
+        if (res.ok) { success(); return; }
+        if (res.status === 400) {
+          input.setAttribute("aria-invalid", "true");
+          throw new Error("Confira o email e tente de novo.");
+        }
+        throw new Error("Não consegui enviar agora. Tenta de novo em instantes.");
+      }).catch(function (err) {
+        var text = err && err.message && err.message.indexOf("Confira") === 0
+          ? err.message : "Não consegui enviar agora. Tenta de novo em instantes.";
+        say(text, true);
+        btn.disabled = false;
+        btn.textContent = o.button;
+      });
+    });
+
+    return form;
+  }
+
+  // ---------- Início ----------
+  document.querySelectorAll(".insta-link").forEach(function (a) { a.href = C.INSTAGRAM_URL; });
+  $("year").textContent = new Date().getFullYear();
+  $("hero-form").append(subscribeForm({
+    id: "f-hero",
+    button: "Assinar grátis",
+    done: "Pronto, você está na lista. A próxima edição chega no seu email."
+  }));
+  var first = C.CATEGORIES.find(function (c) { return byCat(c.id).length; });
+  if (first) selectCat(first.id); else $("vitrine").hidden = true;
+})();

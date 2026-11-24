@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "deny": [
+      "Bash(git push --force:*)",
+      "Bash(git push -f:*)",
+      "mcp__Vercel__buy_domain",
+      "mcp__meta"
+    ],
+    "ask": [
+      "mcp__Vercel__create_deployment",
+      "mcp__Vercel__request_promote"
+    ]
+  }
+}
