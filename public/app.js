@@ -204,7 +204,10 @@
 
     // Consentimento pelo clique: o texto fica junto do botão, sem caixa de marcar.
     var consentText = el("p", "consent",
-      "Ao assinar, você aceita receber a newsletter semanal da mybusiness. Sai quando quiser, pelo link em todo email.");
+      "Ao assinar, você aceita receber a newsletter semanal da mybusiness. Sai quando quiser, pelo link em todo email. ");
+    var privacy = el("a", null, "Privacidade");
+    privacy.href = "privacidade";
+    consentText.append(privacy);
     consentText.id = o.id + "-consent";
     btn.setAttribute("aria-describedby", consentText.id);
 
@@ -284,6 +287,12 @@
     button: "Assinar grátis",
     done: "Pronto, você está na lista. A próxima edição chega no seu email."
   }));
-  var first = C.CATEGORIES.find(function (c) { return byCat(c.id).length; });
-  if (first) selectCat(first.id); else $("vitrine").hidden = true;
+  var first = C.SHOW_SHOWCASE && C.CATEGORIES.find(function (c) { return byCat(c.id).length; });
+  if (first) {
+    selectCat(first.id);
+  } else {
+    // Sem vitrine: some a seção e tudo que aponta pra ela.
+    $("vitrine").hidden = true;
+    document.querySelectorAll("[data-needs-showcase]").forEach(function (n) { n.remove(); });
+  }
 })();

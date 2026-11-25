@@ -10,6 +10,14 @@ window.CONFIG = {
 
   INSTAGRAM_URL: "https://instagram.com/mybusiness.news",
 
+  // Responsável pelos dados (aparece na página de privacidade — é PÚBLICO).
+  // Email vazio = check.sh bloqueia o deploy.
+  CONTACT_NAME: "Luis Arthur Bertho",
+  CONTACT_EMAIL: "",
+
+  // false = esconde a vitrine (enquanto os produtos abaixo são só exemplos).
+  SHOW_SHOWCASE: false,
+
   CATEGORIES: [
     { id: "skills", label: "Skills de IA" },
     { id: "cursos", label: "Mini-cursos" },

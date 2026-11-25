@@ -13,7 +13,7 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <a class="skip" href="#vitrine">Pular para a vitrine</a>
+  <a class="skip" href="#f-hero-email">Pular para o formulário</a>
 
   <header class="site-header">
     <div class="wrap header-inner">
@@ -21,7 +21,7 @@
         <span class="wordmark">MYBUSINESS</span>
       </a>
       <nav aria-label="Principal">
-        <a class="nav-link" href="#vitrine">Vitrine</a>
+        <a class="nav-link" href="#vitrine" data-needs-showcase>Vitrine</a>
         <a class="nav-link insta-link" href="#" rel="noopener">Instagram</a>
       </nav>
     </div>
@@ -38,7 +38,7 @@
         <div class="hero-form" id="hero-form"></div>
         <div class="hero-status" role="note">
           <span class="pulse" aria-hidden="true"></span>
-          <span><strong>Skills e mini-cursos em produção.</strong> Assinante fica sabendo primeiro. <a href="#vitrine">Ver o que vem aí</a></span>
+          <span><strong>Skills e mini-cursos em produção.</strong> Assinante fica sabendo primeiro.<span data-needs-showcase> <a href="#vitrine">Ver o que vem aí</a></span></span>
         </div>
        </div>
         <picture class="hero-logo">
@@ -82,7 +82,10 @@
   <footer class="site-footer">
     <div class="wrap footer-inner">
       <span>© <span id="year"></span> mybusiness</span>
-      <a class="insta-link" href="#" rel="noopener">Instagram</a>
+      <span class="footer-links">
+        <a href="privacidade">Privacidade</a>
+        <a class="insta-link" href="#" rel="noopener">Instagram</a>
+      </span>
     </div>
   </footer>
 

@@ -244,3 +244,19 @@ nav { display: flex; gap: 4px; }
 .footer-inner { display: flex; justify-content: space-between; align-items: center; min-height: 72px; font-size: .875rem; }
 .footer-inner a { display: inline-flex; align-items: center; min-height: 44px; }
 .footer-inner a:hover { color: var(--red-strong); }
+.footer-links { display: flex; gap: 20px; }
+.consent a { color: var(--red-strong); }
+
+/* ---------- Páginas de texto (privacidade, descadastro) ---------- */
+.doc { padding: 48px 0 80px; }
+.doc .wrap { max-width: 760px; }
+.doc h1 { font-size: clamp(2.25rem, 7vw, 3.5rem); line-height: 1; margin: 8px 0 12px; }
+.doc h2 { font-size: 1.5rem; margin: 36px 0 8px; }
+.doc p, .doc li { color: var(--text-2); }
+.doc p + p { margin-top: 12px; }
+.doc ul { padding-left: 20px; margin: 8px 0 0; }
+.doc li + li { margin-top: 6px; }
+.doc strong { color: var(--text); }
+.doc a { color: var(--red-strong); }
+.doc .meta { font: 500 .8125rem/1.4 var(--font-mono); color: var(--text-2); }
+.unsub-box { margin-top: 28px; display: grid; gap: 14px; justify-items: start; }
