@@ -13,7 +13,7 @@ window.CONFIG = {
   // Responsável pelos dados (aparece na página de privacidade — é PÚBLICO).
   // Email vazio = check.sh bloqueia o deploy.
   CONTACT_NAME: "Luis Arthur Bertho",
-  CONTACT_EMAIL: "",
+  CONTACT_EMAIL: "contato@mypan.com.br",
 
   // false = esconde a vitrine (enquanto os produtos abaixo são só exemplos).
   SHOW_SHOWCASE: false,
