@@ -30,9 +30,27 @@ window.CONFIG = {
   // - NUNCA coloque aqui link direto do arquivo pago (Drive, .zip):
   //   o arquivo é entregue depois do pagamento, nunca pelo site.
   // - cover: imagem opcional (ex.: "img/x.webp"). Sem ela, a capa usa as cores da marca.
+  // - priceNote: linha opcional abaixo do preço (ex.: extras cobrados no checkout).
+  //   O preço aparece mesmo em "Em breve", pra quem chega saber quanto custa.
   //
-  // ATENÇÃO: os 3 itens abaixo são EXEMPLOS. Troque pelos reais.
+  // ATENÇÃO: "animacao-reels" é o produto REAL em preparo (falta a skill revisada
+  // e o Payment Link do Stripe). Os 3 itens depois dele são EXEMPLOS: apagar antes
+  // de ligar SHOW_SHOWCASE.
   PRODUCTS: [
+    {
+      id: "animacao-reels",
+      category: "skills",
+      title: "Animação pra Reels e Stories",
+      // RASCUNHO: confirmar a promessa depois de ler a skill (ela entrega vídeo pronto?).
+      desc: "Você descreve o que quer mostrar e a IA monta a animação no formato vertical, pronta pra postar. Sem programa de edição.",
+      fit: "quem posta pro próprio negócio e não tem tempo nem editor de vídeo",
+      prompt: "Faz uma animação de 10s pro Reels mostrando <produto> com o preço <valor>",
+      format: "1 tipo de animação à escolha · usa no Claude (claude.ai)",
+      price: "R$ 27,90",
+      priceNote: "+ R$ 7,90 por tipo extra, escolhido no pagamento",
+      checkoutUrl: "",
+      cover: "",
+    },
     {
       id: "resumir-reunioes",
       category: "skills",

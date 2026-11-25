@@ -156,17 +156,25 @@
   }
 
   // ---------- Ação: comprar ou entrar na lista ----------
+  // Preço + nota (ex.: extras) aparecem nos dois modos: quem chega sabe quanto custa.
+  function priceBlock(p) {
+    var f = document.createDocumentFragment();
+    if (p.price) f.append(el("p", "price", p.price));
+    if (p.price && p.priceNote) f.append(el("p", "price-note", p.priceNote));
+    return f;
+  }
+
   function renderAction(p, live) {
     var box = $("d-action");
     box.textContent = "";
+    box.append(priceBlock(p));
 
     if (live) {
-      var price = el("p", "price", p.price);
       var sub = el("p", "action-sub", "Pagamento único · acesso enviado por email após a compra");
       var buy = el("a", "btn btn-primary", "Comprar agora");
       buy.href = p.checkoutUrl;
       buy.rel = "noopener";
-      box.append(price, sub, buy);
+      box.append(sub, buy);
       return;
     }
 
