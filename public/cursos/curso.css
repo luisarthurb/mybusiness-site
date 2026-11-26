@@ -195,6 +195,42 @@ body.curso { background: var(--gray-50); }
 .sn-t { font: 600 11.5px/1.2 var(--font-body); margin-bottom: 2px; }
 .sn-l { font: 400 11px/1.35 var(--font-mono); color: #444; }
 
+/* Aula 3: chave desligada, menu de upload, .zip, árvores e descrições */
+.shelf-item.is-off::after { background: radial-gradient(circle at 7px 7px, #FFF 4.5px, #B9B4AE 5px); }
+.shelf-opt { font: 500 11.5px/1.2 var(--font-body); padding: 7px 8px; border-radius: 8px; background: var(--gray-50); }
+.shelf-opt.is-hl { background: #FFF0E8; outline: 1.5px solid var(--a-accent); }
+.shelf-opt.shelf-plus { justify-self: start; width: 28px; text-align: center; padding: 5px 0; font-weight: 700; font-size: 14px; }
+.shelf-opt.shelf-zip { font-family: var(--font-mono); font-size: 11px; background: #FFF; border: 1px dashed var(--a-accent); }
+
+.trees { width: min(100%, 760px); display: grid; gap: 10px; }
+@media (min-width: 760px) { .trees { grid-template-columns: repeat(3, 1fr); gap: 12px; } }
+.tree { background: #FFF; color: var(--text); border-radius: 12px; padding: 10px 12px; border: 2px solid transparent; }
+.tree.ok { border-color: var(--ok); }
+.tree-h { font: 700 12.5px/1.2 var(--font-body); margin-bottom: 6px; }
+.tree.ok .tree-h { color: var(--ok); }
+.tree.bad .tree-h { color: var(--err); }
+.tree-pre { margin: 0; font: 400 11.5px/1.5 var(--font-mono); white-space: pre; overflow: hidden; }
+
+.descs { width: min(100%, 620px); display: grid; gap: 10px; }
+.desc { background: #FFF; color: var(--text); border-radius: 12px; padding: 10px 12px; border: 2px solid transparent; display: grid; gap: 4px; }
+.desc.ok { border-color: var(--ok); }
+.desc-h { font: 700 12.5px/1.2 var(--font-body); }
+.desc.ok .desc-h { color: var(--ok); }
+.desc.bad .desc-h { color: var(--err); }
+.desc-code { font: 400 12px/1.45 var(--font-mono); }
+.desc-note { font-size: 12px; color: var(--text-2); }
+
+/* Chamada no fim da aula (cartão claro dentro do player) */
+.player-cta {
+  margin-top: 22px; padding: 18px; border-radius: var(--r-md); background: var(--white); color: var(--text);
+  display: grid; gap: 14px; border-left: 4px solid var(--red);
+}
+.player-cta[hidden] { display: none; }
+@media (min-width: 900px) { .player-cta { grid-template-columns: 1fr minmax(320px, 460px); align-items: center; gap: 28px; } }
+.cta-t { font: 800 1.5rem/1.05 var(--font-display); text-transform: uppercase; }
+.cta-s { margin-top: 6px; color: var(--text-2); font-size: .9375rem; }
+.player-cta :focus-visible { outline-color: var(--red-strong); }
+
 /* Quadro (cenas de explicação) */
 .board {
   position: absolute; inset: 0; display: none; place-items: center; padding: 16px;

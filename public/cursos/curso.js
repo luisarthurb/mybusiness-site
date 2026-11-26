@@ -270,18 +270,52 @@
     var last = state.cena === a.cenas.length - 1;
     var hasNext = ready.indexOf(a) < ready.length - 1;
     $("next-scene").textContent = !last ? "Próxima →" : hasNext ? "Próxima aula →" : "Ver as skills prontas →";
+    renderCta(a, last);
   }
-  $("prev-scene").addEventListener("click", function () { goScene(state.cena - 1); });
+  // Chamada pras skills pagas no fim da aula (só aulas com "cta" em aulas.js).
+  function renderCta(a, last) {
+    var box = $("player-cta");
+    if (!a.cta || !last) { box.hidden = true; return; }
+    box.hidden = false;
+    if (box.getAttribute("data-aula") === String(a.n)) return;
+    box.setAttribute("data-aula", String(a.n));
+    box.textContent = "";
+    var C = window.CONFIG || {};
+    var txt = el("div", "cta-text");
+    txt.append(el("p", "cta-t", a.cta.titulo), el("p", "cta-s", C.SHOW_SHOWCASE ? a.cta.textoVitrine : a.cta.textoEmBreve));
+    box.append(txt);
+    if (C.SHOW_SHOWCASE) {
+      var l = el("a", "btn btn-primary", a.cta.botaoVitrine);
+      l.href = "/#vitrine";
+      box.append(l);
+    } else {
+      var f = el("div", "cta-form");
+      f.append(MB.subscribeForm({
+        id: "f-cta-" + a.n,
+        interest: a.cta.interesse,
+        button: "Me avise",
+        done: "Pronto. Você vai saber primeiro quando as skills abrirem.",
+      }));
+      box.append(f);
+    }
+  }
+  // No celular o botão fica abaixo do palco: se o palco saiu de vista, volta até ele.
+  function revealStage() {
+    if ($("stage").getBoundingClientRect().top < 56) {
+      $("player").scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+    }
+  }
+  $("prev-scene").addEventListener("click", function () { goScene(state.cena - 1); revealStage(); });
   $("next-scene").addEventListener("click", function () {
     var a = aulaBy(state.aula);
-    if (state.cena < a.cenas.length - 1) return goScene(state.cena + 1);
+    if (state.cena < a.cenas.length - 1) { goScene(state.cena + 1); revealStage(); return; }
     var i = ready.indexOf(a);
     if (i < ready.length - 1) return openAula(ready[i + 1].n, true);
     selectSkill(a.skill || D.SKILLS[0].id);
     selectTab("skills", true);
     history.replaceState(null, "", "#skills");
   });
-  $("replay").addEventListener("click", function () { playScene(); });
+  $("replay").addEventListener("click", function () { playScene(); revealStage(); });
 
   // Troca de tela no celular (Claude | ChatGPT). No desktop as duas aparecem juntas.
   function showMock(k) {
@@ -429,6 +463,15 @@
     }
     return true;
   }
+  function treeBox(kind, title, lines) {
+    var t = el("div", "tree " + kind);
+    t.append(el("p", "tree-h", title));
+    var pre = el("pre", "tree-pre", lines.join("\n"));
+    t.append(pre);
+    t.style.opacity = "0";
+    return t;
+  }
+  function shelfOpt(m, text, cls) { var li = el("li", "shelf-opt" + (cls ? " " + cls : ""), text); li.style.opacity = "0"; m.list.append(li); return li; }
   var mockA = function () { return mocks.find(function (m) { return m.root.getAttribute("data-ai") === "a"; }); };
   var mockB = function () { return mocks.find(function (m) { return m.root.getAttribute("data-ai") === "b"; }); };
 
@@ -662,7 +705,7 @@
         showMock("b");
         var a = mockA(), b = mockB();
         a.shelf.classList.add("is-open"); shelfItem(a, SKILL_NAME);
-        anim(a.root, { opacity: 0.45 }, { duration: 0.3 });
+        anim(a.root, { opacity: [1, 0.45] }, { duration: 0.3 });
         var blk = el("div", "msg-block", "Você responde clientes da Doce Lar. No máximo 4 linhas, tom simpático, assina “Equipe Doce Lar”. Nunca prometa entrega no mesmo dia…");
         b.chat.append(blk);
         await wait(300); if (!ok()) return;
@@ -717,6 +760,147 @@
         if (!ok()) return;
         await wait(500); if (!ok()) return;
         await stamp("Salve a versão nova");
+      },
+    ],
+    3: [
+      // 1. Antes: ligue a execução de código
+      async function (ok) {
+        showMock("a");
+        var a = mockA(), b = mockB();
+        anim(b.root, { opacity: [1, 0.4] }, { duration: 0.3 });
+        a.shelfTitle.textContent = "Settings › Capabilities";
+        a.shelf.classList.add("is-open");
+        var it = shelfItem(a, "Code execution and file creation");
+        it.classList.add("is-off");
+        await anim(a.shelf, { opacity: [0, 1], y: [-8, 0] }, { duration: 0.35 });
+        if (!ok()) return;
+        await wait(700); if (!ok()) return;
+        it.classList.remove("is-off");
+        await anim(it, { scale: [1, 1.06, 1] }, { duration: 0.45 });
+        if (!ok()) return;
+        await stamp("Uma vez só");
+      },
+
+      // 2. O .zip certo tem a pasta dentro
+      async function (ok) {
+        var wrap = el("div", "trees");
+        var good = treeBox("ok", "✓ Certo", ["atendimento-whatsapp (.zip)", "└ atendimento-whatsapp/", "   ├ SKILL.md", "   └ modelos/"]);
+        var bad1 = treeBox("bad", "✗ Arquivo solto", ["atendimento-whatsapp (.zip)", "└ SKILL.md"]);
+        var bad2 = treeBox("bad", "✗ Pasta dentro de pasta", ["skill (.zip)", "└ skill/", "   └ atendimento-whatsapp/", "      └ SKILL.md"]);
+        wrap.append(good, bad1, bad2);
+        board.append(wrap);
+        await showBoard(); if (!ok()) return;
+        await anim([good, bad1, bad2], { opacity: [0, 1], y: [14, 0] }, { duration: 0.4, delay: stagger(0.3) });
+        if (!ok()) return;
+        await wait(500); if (!ok()) return;
+        anim([bad1, bad2], { opacity: 0.45 }, { duration: 0.3 });
+        await anim(good, { scale: [1, 1.04, 1] }, { duration: 0.5 });
+      },
+
+      // 3. Suba em Customize › Skills
+      async function (ok) {
+        showMock("a");
+        var a = mockA(), b = mockB();
+        anim(b.root, { opacity: [1, 0.4] }, { duration: 0.3 });
+        a.shelf.classList.add("is-open");
+        var plus = shelfOpt(a, "+", "shelf-plus");
+        await anim(a.shelf, { opacity: [0, 1], y: [-8, 0] }, { duration: 0.35 });
+        await anim(plus, { opacity: [0, 1], scale: [0.6, 1] }, { type: "spring", bounce: 0.5, duration: 0.5 });
+        if (!ok()) return;
+        await wait(350); if (!ok()) return;
+        var o1 = shelfOpt(a, "+ Create skill");
+        await anim(o1, { opacity: [0, 1], y: [-6, 0] }, { duration: 0.3 });
+        await wait(450); if (!ok()) return;
+        var o2 = shelfOpt(a, "Upload a skill", "is-hl");
+        await anim(o2, { opacity: [0, 1], y: [-6, 0] }, { duration: 0.3 });
+        if (!ok()) return;
+        await wait(600); if (!ok()) return;
+        a.list.textContent = "";
+        var zip = shelfOpt(a, "atendimento-whatsapp (.zip)", "shelf-zip");
+        await anim(zip, { opacity: [0, 1], y: [-30, 0] }, { type: "spring", bounce: 0.35, duration: 0.6 });
+        if (!ok()) return;
+        await wait(600); if (!ok()) return;
+        await anim(zip, { opacity: [1, 0] }, { duration: 0.25 });
+        zip.remove();
+        var it = shelfItem(a, SKILL_NAME);
+        it.classList.add("is-off");
+        await anim(it, { opacity: [0, 1], scale: [0.7, 1] }, { type: "spring", bounce: 0.45, duration: 0.55 });
+        if (!ok()) return;
+        await stamp("Na lista, ainda desligada");
+      },
+
+      // 4. Ligue e teste
+      async function (ok) {
+        showMock("a");
+        var a = mockA(), b = mockB();
+        anim(b.root, { opacity: [1, 0.4] }, { duration: 0.3 });
+        a.shelf.classList.add("is-open");
+        var it = shelfItem(a, SKILL_NAME);
+        it.classList.add("is-off");
+        await wait(500); if (!ok()) return;
+        it.classList.remove("is-off");
+        await anim(it, { scale: [1, 1.08, 1] }, { duration: 0.45 });
+        if (!ok()) return;
+        var q = "Responde esse cliente: “aceita Pix?”";
+        await typeInto(a.typed, q, 32);
+        if (!ok()) return;
+        await wait(250); if (!ok()) return;
+        a.typed.textContent = "";
+        await anim(bubble(a, "u", q), { opacity: [0, 1], y: [10, 0] }, { duration: 0.35 });
+        if (!ok()) return;
+        it.classList.add("is-on");
+        await anim(chip(a, "Usando a skill " + SKILL_NAME), { opacity: [0, 1], scale: [0.85, 1] }, { type: "spring", bounce: 0.4, duration: 0.5 });
+        if (!ok()) return;
+        var r = bubble(a, "a", ""); r.style.opacity = "1";
+        await typeInto(r.querySelector(".msg-text"), "Aceitamos sim! Pix na entrega ou antecipado, como preferir. Quer fazer o pedido? — Equipe Doce Lar", 48);
+      },
+
+      // 5. Não usou? Olhe a chave e a descrição
+      async function (ok) {
+        var wrap = el("div", "descs");
+        function card(kind, head, code, note) {
+          var c = el("div", "desc " + kind);
+          c.append(el("p", "desc-h", head), el("p", "desc-code", code), el("p", "desc-note", note));
+          c.style.opacity = "0"; wrap.append(c); return c;
+        }
+        var bad = card("bad", "✗ Vaga", "description: Ajuda com clientes.", "A IA não sabe quando usar.");
+        var good = card("ok", "✓ Clara", "description: Responde mensagens de clientes (WhatsApp, Instagram) no tom da loja. Use quando o usuário pedir pra responder um cliente.", "Diz o quê e quando, com as palavras do pedido.");
+        var tip = el("p", "bd-req", "No teste: “usa a minha skill de atendimento pra responder isso”");
+        tip.style.opacity = "0"; wrap.append(tip);
+        board.append(wrap);
+        await showBoard(); if (!ok()) return;
+        await anim(bad, { opacity: [0, 1], y: [12, 0] }, { duration: 0.4 });
+        await wait(700); if (!ok()) return;
+        await anim(good, { opacity: [0, 1], y: [12, 0] }, { duration: 0.4 });
+        anim(bad, { opacity: 0.5 }, { duration: 0.3 });
+        if (!ok()) return;
+        await wait(600); if (!ok()) return;
+        await anim(tip, { opacity: [0, 1], y: [8, 0] }, { duration: 0.4 });
+      },
+
+      // 6. E no ChatGPT?
+      async function (ok) {
+        var wrap = el("div", "where");
+        var h = el("p", "where-h", "Subir skill pronta · " + D.VERIFICADO_EM);
+        var rows = [
+          ["Claude", "Sobe a skill", "Qualquer plano, com a execução de código ligada.", false],
+          ["ChatGPT Business, Enterprise, Edu", "Sobe a skill", "Plugins › Skills › Create › Upload from your computer.", false],
+          ["ChatGPT Plus e grátis", "Só o texto", "Cole o SKILL.md num Projeto. Arquivos extras (modelos, scripts) não funcionam.", true],
+        ].map(function (r) {
+          var row = el("div", "where-row");
+          row.append(el("span", "where-name", r[0]), el("span", "where-pill" + (r[3] ? " part" : ""), r[1]), el("span", "where-note", r[2]));
+          row.style.opacity = "0";
+          return row;
+        });
+        var foot = el("p", "where-foot", "Skill com arquivos extras? Use onde tem skill de verdade.");
+        h.style.opacity = "0"; foot.style.opacity = "0";
+        wrap.append(h); rows.forEach(function (r) { wrap.append(r); }); wrap.append(foot);
+        board.append(wrap);
+        await showBoard(); if (!ok()) return;
+        await anim(h, { opacity: [0, 1] }, { duration: 0.3 });
+        await anim(rows, { opacity: [0, 1], x: [-14, 0] }, { duration: 0.4, delay: stagger(0.25) });
+        if (!ok()) return;
+        await anim(foot, { opacity: [0, 1], y: [8, 0] }, { duration: 0.4 });
       },
     ],
   };

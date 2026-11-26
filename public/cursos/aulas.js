@@ -99,7 +99,58 @@ window.CURSO = {
         },
       ],
     },
-    { n: 3, titulo: "Ligue, teste e ajuste", min: 3, pronta: false, cenas: [] },
+    {
+      n: 3,
+      titulo: "Instale uma skill pronta",
+      min: 3,
+      pronta: true,
+      skill: "atendimento-whatsapp",
+      telas: {
+        a: { badge: "Upload: qualquer plano", shelf: "Customize › Skills" },
+        b: { badge: "Plus: sem upload de skill", shelf: "Plugins › Skills" },
+      },
+      cenas: [
+        {
+          titulo: "Antes: ligue a execução de código",
+          texto: "Skill só roda com ela ligada. Settings › Capabilities › “Code execution and file creation” (em algumas contas aparece como “Create and edit files”). É uma vez só.",
+        },
+        {
+          titulo: "O .zip certo tem a pasta dentro",
+          texto: "Abra o .zip: dentro tem que estar a pasta da skill, e o SKILL.md dentro dela. Arquivo solto ou pasta dentro de pasta dá erro. O nome da pasta é o nome da skill.",
+        },
+        {
+          titulo: "Suba em Customize › Skills",
+          texto: "Clique no +, depois em “+ Create skill” e em “Upload a skill”. Escolha o .zip. A skill aparece na sua lista.",
+        },
+        {
+          titulo: "Ligue e teste",
+          texto: "A skill não liga sozinha: ative a chave dela na lista. Depois peça algo que combine com a descrição. Se a resposta seguir as regras da skill, funcionou.",
+        },
+        {
+          titulo: "Não usou? Olhe a chave e a descrição",
+          texto: "Confira se a chave está ligada. Depois, a descrição: ela tem que dizer quando usar, com as palavras do seu pedido. No teste, seja explícito: “usa a minha skill de atendimento pra responder isso”. Ajuda, mas não é garantia.",
+        },
+        {
+          titulo: "E no ChatGPT?",
+          texto: "Business, Enterprise e Edu: Plugins › Skills › Create › “Upload from your computer”. No Plus: dá pra colar o texto do SKILL.md num Projeto, mas os arquivos extras da skill (modelos, scripts) não funcionam lá.",
+        },
+      ],
+      extras: [
+        {
+          titulo: "Pedido de teste explícito",
+          sub: "Use quando a skill não disparar sozinha",
+          texto: "Usa a minha skill <nome da skill> pra <tarefa>: <cole aqui o caso real>",
+        },
+      ],
+      // Chamada no fim da aula. Com a vitrine ligada (config.js) vira link; senão, "Me avise".
+      cta: {
+        titulo: "Quer skills prontas pro seu negócio?",
+        textoEmBreve: "As skills da mybusiness chegam em .zip: você instala do jeito que acabou de ver. Assine e saiba primeiro quando abrirem.",
+        textoVitrine: "As skills da mybusiness chegam em .zip: você instala do jeito que acabou de ver.",
+        botaoVitrine: "Ver as skills",
+        interesse: "skills-pagas",
+      },
+    },
     { n: 4, titulo: "Plugins e conectores: a IA nos seus apps", min: 4, pronta: false, cenas: [] },
     { n: 5, titulo: "Por baixo do capô (opcional)", min: 4, pronta: false, tecnica: true, cenas: [] },
   ],
