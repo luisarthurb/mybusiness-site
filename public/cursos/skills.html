@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Minicurso grátis: Skills de IA · mybusiness</title>
+  <meta name="description" content="Minicurso grátis e animado: o que é skill de IA, como criar conversando, como ligar e como conectar a IA nos seus apps. Lado a lado em dois assistentes.">
+  <meta name="theme-color" content="#ffffff">
+  <link rel="icon" type="image/png" href="/img/logo-arco.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/cursos/curso.css">
+  <script src="/config.js" defer></script>
+  <script src="/shared.js" defer></script>
+  <script src="/vendor/motion.min.js" defer></script>
+  <script src="/cursos/aulas.js" defer></script>
+  <script src="/cursos/curso.js" defer></script>
+</head>
+<body class="curso">
+  <a class="skip" href="#player">Pular para a aula</a>
+
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="/" aria-label="mybusiness, início"><span class="wordmark">MYBUSINESS</span></a>
+      <span class="header-tag">Minicurso · Skills de IA</span>
+    </div>
+  </header>
+
+  <main>
+    <!-- TOPO: título + progresso -->
+    <section class="c-hero">
+      <div class="wrap c-hero-grid">
+        <div class="c-hero-text">
+          <p class="eyebrow">Minicurso grátis · 5 aulas · 18 min</p>
+          <h1>Skills de IA: ensine uma vez, <span class="accent">use sempre.</span></h1>
+          <p class="lede">O que é skill, como criar conversando, como ligar e como conectar a IA nos seus apps. Tudo mostrado lado a lado no Claude e no ChatGPT.</p>
+        </div>
+
+        <div class="progress-card" id="progress-card">
+          <div class="dots" id="dots" aria-hidden="true"></div>
+          <div class="progress-text">
+            <p class="progress-count" id="progress-count">0 de 5 aulas vistas</p>
+            <p class="progress-sub">O progresso fica salvo neste aparelho</p>
+          </div>
+          <button class="btn btn-primary btn-sm" type="button" id="continue">Começar na Aula 1</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ABAS -->
+    <div class="wrap">
+      <div class="seg" role="tablist" aria-label="Partes do curso" id="tabs">
+        <button class="seg-btn" type="button" role="tab" id="tab-aulas" aria-controls="p-aulas" aria-selected="true">Aulas <span class="count">5</span></button>
+        <button class="seg-btn" type="button" role="tab" id="tab-skills" aria-controls="p-skills" aria-selected="false" tabindex="-1">Skills prontas <span class="count" id="skills-count">3</span></button>
+        <button class="seg-btn" type="button" role="tab" id="tab-kit" aria-controls="p-kit" aria-selected="false" tabindex="-1">Kit</button>
+      </div>
+    </div>
+
+    <!-- ========== AULAS ========== -->
+    <section class="panel" id="p-aulas" role="tabpanel" aria-labelledby="tab-aulas">
+      <div class="wrap">
+        <p class="next-hint" id="next-hint">próxima ↓</p>
+        <div class="aula-grid" id="aula-grid"></div>
+      </div>
+
+      <!-- Player: cenas animadas -->
+      <div class="player" id="player" tabindex="-1">
+        <div class="wrap">
+          <div class="ai-switch" id="ai-switch" role="group" aria-label="Qual assistente mostrar">
+            <button type="button" class="ai-btn" data-show="a" aria-pressed="true">Claude</button>
+            <button type="button" class="ai-btn" data-show="b" aria-pressed="false">ChatGPT</button>
+          </div>
+
+          <!-- A animação é ilustração: o conteúdo está na legenda abaixo (lida por leitor de tela). -->
+          <div class="stage" id="stage" aria-hidden="true">
+            <div class="screens show-a" id="screens">
+              <div class="mock mock-a" data-ai="a">
+                <div class="mock-bar">
+                  <span class="mock-ico"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M4 4h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H10l-5 4v-4H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/></svg></span>
+                  <span class="mock-name">Claude</span>
+                  <span class="mock-badge">Skills: todos os planos</span>
+                </div>
+                <div class="mock-chat"></div>
+                <div class="mock-input"><span class="mock-typed"></span><span class="mock-caret"></span><span class="mock-send"></span></div>
+                <div class="mock-shelf"><p class="shelf-title">Customize › Skills</p><ul class="shelf-list"></ul></div>
+              </div>
+              <div class="mock mock-b" data-ai="b">
+                <div class="mock-bar">
+                  <span class="mock-ico"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 3C6.5 3 2 6.8 2 11.5c0 2.3 1.1 4.4 2.9 5.9L4 21l4.2-2.1c1.2.4 2.5.6 3.8.6 5.5 0 10-3.8 10-8.5S17.5 3 12 3z"/></svg></span>
+                  <span class="mock-name">ChatGPT</span>
+                  <span class="mock-badge">Skills: Business, Enterprise, Edu</span>
+                </div>
+                <div class="mock-chat"></div>
+                <div class="mock-input"><span class="mock-typed"></span><span class="mock-caret"></span><span class="mock-send"></span></div>
+                <div class="mock-shelf"><p class="shelf-title">Plugins › Skills</p><ul class="shelf-list"></ul></div>
+              </div>
+            </div>
+            <div class="board" id="board"></div>
+            <div class="stamp-layer" id="stamp-layer"></div>
+          </div>
+
+          <div class="caption" aria-live="polite" id="caption">
+            <p class="cap-count" id="cap-count">Cena 1 de 6</p>
+            <h2 class="cap-title" id="cap-title">Carregando a aula…</h2>
+            <p class="cap-text" id="cap-text"></p>
+          </div>
+
+          <div class="controls">
+            <button class="ctl" type="button" id="prev-scene">← Anterior</button>
+            <button class="ctl" type="button" id="replay">Repetir cena</button>
+            <button class="ctl ctl-primary" type="button" id="next-scene">Próxima →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cabeçalho da aula + cenas + materiais -->
+      <div class="wrap">
+        <div class="lesson-head">
+          <div>
+            <h2 class="lesson-title" id="lesson-title">Aula 1</h2>
+            <p class="lesson-meta" id="lesson-meta"></p>
+          </div>
+          <div class="lesson-actions">
+            <button class="btn-out" type="button" id="mark" aria-pressed="false">✓ Marcar como vista</button>
+            <button class="btn-out btn-icon" type="button" id="prev-aula" aria-label="Aula anterior">‹</button>
+            <button class="btn-out btn-icon" type="button" id="next-aula" aria-label="Próxima aula">›</button>
+          </div>
+        </div>
+
+        <div class="lesson-cols">
+          <div>
+            <p class="col-label">Cenas</p>
+            <ol class="scene-list" id="scene-list"></ol>
+          </div>
+          <div>
+            <p class="col-label">Materiais</p>
+            <ul class="materials" id="materials"></ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== SKILLS PRONTAS ========== -->
+    <section class="panel" id="p-skills" role="tabpanel" aria-labelledby="tab-skills" hidden>
+      <div class="wrap">
+        <article class="sk-detail" id="sk-detail" aria-labelledby="sk-title">
+          <div class="sk-file" aria-label="Conteúdo da skill">
+            <p class="sk-file-label">SKILL.md</p>
+            <pre class="sk-pre" id="sk-pre" tabindex="0"></pre>
+          </div>
+          <div class="sk-info">
+            <p class="sk-eyebrow" id="sk-eyebrow"></p>
+            <h2 id="sk-title"></h2>
+            <p class="sk-desc" id="sk-desc"></p>
+            <dl class="rows" id="sk-rows"></dl>
+            <div class="sk-box">
+              <div class="sk-box-head">
+                <span class="sk-folder" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></span>
+                <div>
+                  <p class="sk-name" id="sk-name"></p>
+                  <p class="sk-kind">Skill · texto pra colar</p>
+                </div>
+                <button class="btn-out" type="button" id="sk-copy">Copiar a skill</button>
+              </div>
+              <details class="sk-how">
+                <summary>Como instalar</summary>
+                <ol>
+                  <li><strong>Claude (qualquer plano):</strong> numa conversa, mande “Cria uma skill com este conteúdo:” e cole. Ele monta a skill e mostra como salvar. Precisa da execução de código ligada (veja a aba Kit).</li>
+                  <li><strong>ChatGPT Business, Enterprise ou Edu:</strong> barra lateral Plugins › aba Skills › Create › “Create with editor”, e cole.</li>
+                  <li><strong>ChatGPT Plus ou grátis:</strong> ainda sem skills. Crie um Projeto e cole o texto (sem o bloco entre os <code>---</code>) nas instruções do projeto.</li>
+                </ol>
+              </details>
+            </div>
+          </div>
+        </article>
+
+        <div class="sk-thumbs" id="sk-thumbs" role="group" aria-label="Escolha uma skill"></div>
+      </div>
+    </section>
+
+    <!-- ========== KIT ========== -->
+    <section class="panel" id="p-kit" role="tabpanel" aria-labelledby="tab-kit" hidden>
+      <div class="wrap">
+        <div class="kit">
+          <div class="kit-head">
+            <div>
+              <h2>O kit de ligação</h2>
+              <p>Três passos, uma vez só. Depois a IA cria as skills com você.</p>
+            </div>
+          </div>
+          <ol class="kit-steps">
+            <li>
+              <span class="kit-n" aria-hidden="true">01</span>
+              <div>
+                <p class="kit-t">Ligue as skills no Claude.</p>
+                <p class="kit-s">Em Settings › Capabilities, ative “Code execution and file creation”. Depois, em Customize › Skills, confira se a <code>skill-creator</code> está ligada. No app em português, os nomes podem aparecer traduzidos.</p>
+              </div>
+            </li>
+            <li>
+              <span class="kit-n" aria-hidden="true">02</span>
+              <div>
+                <p class="kit-t">No ChatGPT, confira seu plano.</p>
+                <p class="kit-s">Business, Enterprise ou Edu: barra lateral Plugins › aba Skills. Plus ou grátis: ainda sem skills; use um Projeto com as instruções. Não perca tempo criando GPT: os GPTs personalizados serão aposentados em 11/12/2026.</p>
+              </div>
+            </li>
+            <li>
+              <span class="kit-n" aria-hidden="true">03</span>
+              <div>
+                <p class="kit-t">Mande esta mensagem pra IA:</p>
+                <div class="kit-copy">
+                  <code id="kit-msg">Quero criar uma skill pro meu negócio. Antes, me faça 5 perguntas sobre como eu trabalho, uma de cada vez. Depois monte a skill e me diga como salvar.</code>
+                  <button class="btn-out" type="button" id="kit-copy">Copiar</button>
+                </div>
+              </div>
+            </li>
+          </ol>
+          <p class="kit-foot">Ela entrevista você, escreve a skill e explica onde salvar. Se pedir pra ligar algo que você não entende, pare e pergunte antes.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Cartões finais (todas as abas) -->
+    <div class="wrap end-cards">
+      <div class="end-card">
+        <div>
+          <p class="end-t">Ver em outro aparelho</p>
+          <p class="end-s">Abra este link no celular ou no notebook. O progresso fica salvo em cada aparelho.</p>
+        </div>
+        <div class="end-link">
+          <code id="page-url">/cursos/skills</code>
+          <button class="btn-out" type="button" id="copy-url">Copiar</button>
+        </div>
+      </div>
+      <div class="end-card end-news">
+        <div>
+          <p class="end-t">Próximo passo: a newsletter</p>
+          <p class="end-s">Toda semana, um uso prático de IA pro seu negócio e um pedido pronto pra copiar. As aulas 2 a 5 chegam primeiro pra quem assina.</p>
+        </div>
+        <div class="end-form" id="end-form"></div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-inner">
+      <span>© <span id="year"></span> mybusiness</span>
+      <span class="footer-links">
+        <a href="/privacidade">Privacidade</a>
+        <a href="/">Início</a>
+      </span>
+    </div>
+    <div class="wrap">
+      <p class="disclaimer">Curso independente, sem afiliação. Claude é marca da Anthropic. ChatGPT é marca da OpenAI. Gemini é marca do Google. Copilot é marca da Microsoft. Telas ilustrativas, simplificadas.</p>
+    </div>
+  </footer>
+</body>
+</html>
