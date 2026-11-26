@@ -10,4 +10,8 @@ check 'sb_secret_|service_role|eyJhbGci' "chave secreta/JWT do Supabase no códi
 if grep -q 'CONTACT_EMAIL: ""' public/config.js; then
   echo "BLOQUEADO: CONTACT_EMAIL vazio em public/config.js (a página de privacidade exige contato)"; fail=1
 fi
+# Skill paga dentro do git = produto de graça pra qualquer um (o repo é público).
+if git ls-files --error-unmatch skills >/dev/null 2>&1 || git ls-files | grep -q -E '(^|/)SKILL\.md$|\.skill$'; then
+  echo "BLOQUEADO: skill paga rastreada no git (repo público). Tire com: git rm -r --cached skills"; fail=1
+fi
 [ $fail -eq 0 ] && echo "check.sh OK" || exit 1

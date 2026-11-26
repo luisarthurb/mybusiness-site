@@ -1,0 +1,5 @@
+# Produtos pagos (skills) NUNCA entram neste repo: ele é PÚBLICO.
+# A pasta existe só na máquina de trabalho; a cópia que vale fica fora do GitHub.
+skills/
+*-workspace/
+*.skill
