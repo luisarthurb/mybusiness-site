@@ -17,6 +17,11 @@ window.CURSO = {
       min: 3,
       pronta: true,
       skill: "atendimento-whatsapp",
+      // Etiquetas das telas ilustrativas nesta aula (a = Claude, b = ChatGPT).
+      telas: {
+        a: { badge: "Skills: todos os planos", shelf: "Customize › Skills" },
+        b: { badge: "Skills: Business, Enterprise, Edu", shelf: "Plugins › Skills" },
+      },
       cenas: [
         {
           titulo: "Sem skill, você repete tudo",
@@ -44,7 +49,56 @@ window.CURSO = {
         },
       ],
     },
-    { n: 2, titulo: "Crie sua primeira skill conversando", min: 4, pronta: false, cenas: [] },
+    {
+      n: 2,
+      titulo: "Crie sua primeira skill conversando",
+      min: 4,
+      pronta: true,
+      skill: "atendimento-whatsapp",
+      telas: {
+        a: { badge: "Funciona no plano grátis", shelf: "Customize › Skills" },
+        b: { badge: "Plano Plus: via Projeto", shelf: "Projeto › Instruções" },
+      },
+      cenas: [
+        {
+          titulo: "Comece pedindo a entrevista",
+          texto: "Não escreva a skill sozinho. Diga pra IA o que você repete toda semana e peça pra ela te entrevistar antes. No Claude, isso funciona até no plano grátis.",
+        },
+        {
+          titulo: "Ela pergunta, você responde",
+          texto: "Ela faz uma pergunta por vez: nome da loja, horário, entrega, como você assina, o que nunca dizer. Responda curto, do jeito que você fala com o cliente.",
+        },
+        {
+          titulo: "No Claude, vira skill",
+          texto: "No fim, o Claude escreve o arquivo da skill (SKILL.md) e mostra pra você. Confira os dados e salve. Depois ela aparece em Customize › Skills, pronta pra usar em qualquer conversa.",
+        },
+        {
+          titulo: "No ChatGPT Plus, vira Projeto",
+          texto: "No Plus e no grátis ainda não tem skill. Peça as instruções, clique em New project na barra lateral, depois no menu ••• › Project settings, e cole. Atenção: elas só valem dentro desse projeto.",
+        },
+        {
+          titulo: "Teste com um caso real",
+          texto: "Mande uma pergunta de cliente de verdade. No Claude, numa conversa nova. No ChatGPT, dentro do projeto. Se ela responder no seu tom e com os seus dados, funcionou.",
+        },
+        {
+          titulo: "Não gostou? Corrija falando",
+          texto: "Ficou longo ou formal? Diga o que mudar. Ela reescreve; você salva a versão nova da skill ou cola as instruções novas no projeto. Duas ou três rodadas de ajuste é normal.",
+        },
+      ],
+      // Materiais extras (botão Copiar).
+      extras: [
+        {
+          titulo: "Pedido pra criar a skill (Claude)",
+          sub: "Troque o que está entre <> e mande numa conversa nova",
+          texto: "Quero criar uma skill pra <tarefa que repito toda semana>. Antes de escrever, me faça perguntas, uma de cada vez, até entender como eu faço. Depois monte a skill e me mostre pra revisar.",
+        },
+        {
+          titulo: "Pedido pras instruções do Projeto (ChatGPT Plus)",
+          sub: "O resultado você cola em ••• › Project settings",
+          texto: "Quero criar as instruções de um Projeto pra <tarefa que repito toda semana>. Antes de escrever, me faça perguntas, uma de cada vez, até entender como eu faço. Depois escreva as instruções prontas pra eu colar no projeto.",
+        },
+      ],
+    },
     { n: 3, titulo: "Ligue, teste e ajuste", min: 3, pronta: false, cenas: [] },
     { n: 4, titulo: "Plugins e conectores: a IA nos seus apps", min: 4, pronta: false, cenas: [] },
     { n: 5, titulo: "Por baixo do capô (opcional)", min: 4, pronta: false, tecnica: true, cenas: [] },

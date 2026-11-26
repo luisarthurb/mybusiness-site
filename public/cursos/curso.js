@@ -204,6 +204,9 @@
       }).join("\n\n") + "\n\n(Minicurso Skills de IA · mybusiness · verificado em " + D.VERIFICADO_EM + ")";
       copyWithFeedback(b, txt);
     });
+    (a.extras || []).forEach(function (x) {
+      item("⧉", x.titulo, x.sub, "Copiar", function (b) { copyWithFeedback(b, x.texto); });
+    });
     if (a.skill) {
       var sk = D.SKILLS.find(function (s) { return s.id === a.skill; });
       item("{ }", "A skill usada na aula", sk.titulo + ", pronta pra copiar", "Ver skill", function () {
@@ -280,12 +283,13 @@
   });
   $("replay").addEventListener("click", function () { playScene(); });
 
-  // Troca de tela no celular (Claude | ChatGPT)
+  // Troca de tela no celular (Claude | ChatGPT). No desktop as duas aparecem juntas.
+  function showMock(k) {
+    document.querySelectorAll(".ai-btn").forEach(function (x) { x.setAttribute("aria-pressed", String(x.getAttribute("data-show") === k)); });
+    $("screens").className = "screens show-" + k;
+  }
   document.querySelectorAll(".ai-btn").forEach(function (b) {
-    b.addEventListener("click", function () {
-      document.querySelectorAll(".ai-btn").forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); });
-      $("screens").className = "screens show-" + b.getAttribute("data-show");
-    });
+    b.addEventListener("click", function () { showMock(b.getAttribute("data-show")); });
   });
 
   // ================= ANIMAÇÃO =================
@@ -296,6 +300,8 @@
       typed: m.querySelector(".mock-typed"),
       shelf: m.querySelector(".mock-shelf"),
       list: m.querySelector(".shelf-list"),
+      badge: m.querySelector(".mock-badge"),
+      shelfTitle: m.querySelector(".shelf-title"),
     };
   });
   var board = $("board");
@@ -331,7 +337,12 @@
     live = [];
   }
   function resetStage() {
+    var tl = (aulaBy(state.aula) || {}).telas || {};
     mocks.forEach(function (m) {
+      var cfg = tl[m.root.getAttribute("data-ai")] || {};
+      if (cfg.badge) m.badge.textContent = cfg.badge;
+      if (cfg.shelf) m.shelfTitle.textContent = cfg.shelf;
+      m.root.style.opacity = "";
       m.chat.textContent = ""; m.typed.textContent = "";
       m.list.textContent = ""; m.shelf.classList.remove("is-open");
       m.shelf.style.opacity = ""; m.shelf.style.transform = "";
@@ -392,6 +403,34 @@
     return anim(s, { opacity: [0, 1], scale: [1.5, 1], rotate: [-10, -4] }, { type: "spring", bounce: 0.45, duration: 0.6 });
   }
   function both(fn) { return Promise.all(mocks.map(fn)); }
+  function fileChip(m, name) {
+    var f = el("div", "file-chip");
+    f.append(el("span", "fc-ico", "MD"), el("span", "fc-name", name), el("span", "fc-kind", "SKILL.md"));
+    f.style.opacity = "0"; m.chat.append(f); return f;
+  }
+  function shelfNote(m, title, lines) {
+    var li = el("li", "shelf-note");
+    li.append(el("span", "sn-t", title));
+    var spans = lines.map(function (t) { var x = el("span", "sn-l", t); x.style.opacity = "0"; li.append(x); return x; });
+    m.list.append(li);
+    return spans;
+  }
+  // Conversa curta: cada par [pergunta da IA, resposta do usuário] nas duas telas.
+  async function exchange(ok, pairs) {
+    for (var i = 0; i < pairs.length; i++) {
+      var qs = mocks.map(function (m) { var b = bubble(m, "a", ""); b.style.opacity = "1"; return b; });
+      await Promise.all(qs.map(function (b) { return typeInto(b.querySelector(".msg-text"), pairs[i][0], 55); }));
+      if (!ok()) return false;
+      await wait(250); if (!ok()) return false;
+      var us = mocks.map(function (m) { return bubble(m, "u", pairs[i][1]); });
+      await anim(us, { opacity: [0, 1], y: [10, 0] }, { duration: 0.3 });
+      if (!ok()) return false;
+      await wait(350); if (!ok()) return false;
+    }
+    return true;
+  }
+  var mockA = function () { return mocks.find(function (m) { return m.root.getAttribute("data-ai") === "a"; }); };
+  var mockB = function () { return mocks.find(function (m) { return m.root.getAttribute("data-ai") === "b"; }); };
 
   var SKILL_NAME = "atendimento-whatsapp";
   var LONG = "Responde esse cliente no tom da loja: simpático, sem gíria, fala do horário, oferece entrega e assina “Equipe Doce Lar”…";
@@ -562,6 +601,122 @@
         await anim(rows, { opacity: [0, 1], x: [-14, 0] }, { duration: 0.4, delay: stagger(0.22) });
         if (!ok()) return;
         await anim(foot, { opacity: [0, 1], y: [8, 0] }, { duration: 0.4 });
+      },
+    ],
+    2: [
+      // 1. Comece pedindo a entrevista
+      async function (ok) {
+        var asks = {
+          a: "Quero criar uma skill pra responder cliente no WhatsApp. Me entrevista antes.",
+          b: "Quero as instruções de um Projeto pra responder cliente. Me entrevista antes.",
+        };
+        await both(function (m, k) {
+          return wait(k * 300).then(function () { return typeInto(m.typed, asks[m.root.getAttribute("data-ai")], 34); });
+        });
+        if (!ok()) return;
+        await wait(300); if (!ok()) return;
+        var us = mocks.map(function (m) { var t = m.typed.textContent; m.typed.textContent = ""; return bubble(m, "u", t); });
+        await anim(us, { opacity: [0, 1], y: [10, 0] }, { duration: 0.35 });
+        if (!ok()) return;
+        var rs = mocks.map(function (m) { var b = bubble(m, "a", ""); b.style.opacity = "1"; return b; });
+        await Promise.all(rs.map(function (b) { return typeInto(b.querySelector(".msg-text"), "Combinado. Vou fazer uma pergunta por vez.", 45); }));
+      },
+
+      // 2. Ela pergunta, você responde
+      async function (ok) {
+        await exchange(ok, [
+          ["Qual o nome da loja e o horário?", "Doce Lar, seg a sáb, 9h às 18h"],
+          ["Como você assina as mensagens?", "Equipe Doce Lar"],
+          ["Tem algo que eu nunca devo prometer?", "Entrega no mesmo dia"],
+        ]);
+      },
+
+      // 3. No Claude, vira skill
+      async function (ok) {
+        showMock("a");
+        var a = mockA(), b = mockB();
+        var ra = bubble(a, "a", ""); ra.style.opacity = "1";
+        var rb = bubble(b, "a", ""); rb.style.opacity = "1";
+        await Promise.all([
+          typeInto(ra.querySelector(".msg-text"), "Pronto. Montei a skill, revise antes de salvar:", 45),
+          typeInto(rb.querySelector(".msg-text"), "Pronto. Aqui estão as instruções pra colar no seu Projeto:", 45),
+        ]);
+        if (!ok()) return;
+        var fc = fileChip(a, SKILL_NAME);
+        var blk = el("div", "msg-block", "Você responde clientes da Doce Lar. No máximo 4 linhas, tom simpático, assina “Equipe Doce Lar”. Nunca prometa entrega no mesmo dia…");
+        blk.style.opacity = "0"; b.chat.append(blk);
+        await anim([fc, blk], { opacity: [0, 1], y: [10, 0] }, { duration: 0.4, delay: stagger(0.15) });
+        if (!ok()) return;
+        await wait(900); if (!ok()) return;
+        // Claude: salvou, aparece na lista de skills
+        a.shelf.classList.add("is-open");
+        var it = shelfItem(a, SKILL_NAME);
+        await anim(a.shelf, { opacity: [0, 1], y: [-8, 0] }, { duration: 0.35 });
+        await anim(it, { opacity: [0, 1], scale: [0.6, 1] }, { type: "spring", bounce: 0.5, duration: 0.6 });
+        if (!ok()) return;
+        await stamp("Skill salva no Claude");
+      },
+
+      // 4. No ChatGPT Plus, vira Projeto
+      async function (ok) {
+        showMock("b");
+        var a = mockA(), b = mockB();
+        a.shelf.classList.add("is-open"); shelfItem(a, SKILL_NAME);
+        anim(a.root, { opacity: 0.45 }, { duration: 0.3 });
+        var blk = el("div", "msg-block", "Você responde clientes da Doce Lar. No máximo 4 linhas, tom simpático, assina “Equipe Doce Lar”. Nunca prometa entrega no mesmo dia…");
+        b.chat.append(blk);
+        await wait(300); if (!ok()) return;
+        await anim(blk, { scale: [1, 1.03, 1], boxShadow: ["0 0 0 0 rgba(0,0,0,0)", "0 0 0 3px rgba(26,26,26,.6)", "0 0 0 0 rgba(0,0,0,0)"] }, { duration: 0.8 });
+        if (!ok()) return;
+        b.shelf.classList.add("is-open");
+        var lines = shelfNote(b, "Atendimento Doce Lar", ["Responde clientes da Doce Lar.", "Máx. 4 linhas, assina “Equipe Doce Lar”.", "Nunca prometer entrega no mesmo dia."]);
+        await anim(b.shelf, { opacity: [0, 1], y: [-8, 0] }, { duration: 0.35 });
+        await anim(lines, { opacity: [0, 1], x: [-8, 0] }, { duration: 0.3, delay: stagger(0.3) });
+        if (!ok()) return;
+        await stamp("Só vale dentro do projeto");
+      },
+
+      // 5. Teste com um caso real
+      async function (ok) {
+        var a = mockA(), b = mockB();
+        a.shelf.classList.add("is-open"); shelfItem(a, SKILL_NAME);
+        b.shelf.classList.add("is-open");
+        shelfNote(b, "Atendimento Doce Lar", ["Responde clientes da Doce Lar.", "Máx. 4 linhas, assina “Equipe Doce Lar”.", "Nunca prometer entrega no mesmo dia."])
+          .forEach(function (x) { x.style.opacity = "1"; });
+        var q = "Responde: “vocês entregam hoje?”";
+        await both(function (m, k) { return wait(k * 250).then(function () { return typeInto(m.typed, q, 32); }); });
+        if (!ok()) return;
+        await wait(250); if (!ok()) return;
+        mocks.forEach(function (m) { m.typed.textContent = ""; });
+        await anim(mocks.map(function (m) { return bubble(m, "u", q); }), { opacity: [0, 1], y: [10, 0] }, { duration: 0.35 });
+        if (!ok()) return;
+        var ca = chip(a, "Usando a skill " + SKILL_NAME);
+        var cb = chip(b, "No projeto Atendimento Doce Lar");
+        a.list.firstChild.classList.add("is-on");
+        await anim([ca, cb], { opacity: [0, 1], scale: [0.85, 1] }, { type: "spring", bounce: 0.4, duration: 0.5 });
+        if (!ok()) return;
+        var ans = "Oi! Hoje não conseguimos, mas entregamos amanhã de manhã no seu bairro. Quer agendar? — Equipe Doce Lar";
+        var rs = mocks.map(function (m) { var r = bubble(m, "a", ""); r.style.opacity = "1"; return r; });
+        await Promise.all(rs.map(function (r) { return typeInto(r.querySelector(".msg-text"), ans, 48); }));
+      },
+
+      // 6. Não gostou? Corrija falando
+      async function (ok) {
+        var first = "Oi! Hoje não conseguimos, mas entregamos amanhã de manhã no seu bairro. Quer agendar? — Equipe Doce Lar";
+        mocks.forEach(function (m) { bubble(m, "a", first).style.opacity = "0.4"; });
+        var fix = "Ficou longo. Máximo 2 linhas e sem “Oi”.";
+        await both(function (m, k) { return wait(k * 250).then(function () { return typeInto(m.typed, fix, 32); }); });
+        if (!ok()) return;
+        await wait(250); if (!ok()) return;
+        mocks.forEach(function (m) { m.typed.textContent = ""; });
+        await anim(mocks.map(function (m) { return bubble(m, "u", fix); }), { opacity: [0, 1], y: [10, 0] }, { duration: 0.35 });
+        if (!ok()) return;
+        var short = "Hoje não dá. Entregamos amanhã cedo, agendo pra você? — Equipe Doce Lar";
+        var rs = mocks.map(function (m) { var r = bubble(m, "a", ""); r.style.opacity = "1"; return r; });
+        await Promise.all(rs.map(function (r) { return typeInto(r.querySelector(".msg-text"), short, 45); }));
+        if (!ok()) return;
+        await wait(500); if (!ok()) return;
+        await stamp("Salve a versão nova");
       },
     ],
   };
