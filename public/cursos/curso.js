@@ -377,6 +377,7 @@
       if (cfg.badge) m.badge.textContent = cfg.badge;
       if (cfg.shelf) m.shelfTitle.textContent = cfg.shelf;
       m.root.style.opacity = "";
+      m.root.querySelectorAll(".perm").forEach(function (x) { x.remove(); });
       m.chat.textContent = ""; m.typed.textContent = "";
       m.list.textContent = ""; m.shelf.classList.remove("is-open");
       m.shelf.style.opacity = ""; m.shelf.style.transform = "";
@@ -472,10 +473,53 @@
     return t;
   }
   function shelfOpt(m, text, cls) { var li = el("li", "shelf-opt" + (cls ? " " + cls : ""), text); li.style.opacity = "0"; m.list.append(li); return li; }
+  // Aula 4: linha de conector (nome + botão) e pedido de permissão dentro da tela
+  function connRow(m, name, btn) {
+    var li = el("li", "conn-row");
+    li.append(el("span", "conn-name", name), el("span", "conn-btn", btn));
+    m.list.append(li);
+    return li;
+  }
+  function connect(li) { var b = li.querySelector(".conn-btn"); b.textContent = "Conectado"; b.classList.add("is-on"); }
+  function permission(m, title, text, btn) {
+    var box = el("div", "perm");
+    box.append(el("p", "perm-t", title), el("p", "perm-s", text), el("span", "perm-btn", btn));
+    box.style.opacity = "0";
+    m.root.append(box);
+    return box;
+  }
+  // Quadros: linhas que aparecem uma a uma
+  function rowsIn(cls, items) {
+    return items.map(function (it) {
+      var r = el("div", cls);
+      if (typeof it === "string") r.textContent = it;
+      else it.forEach(function (part) { r.append(el("span", part[0], part[1])); });
+      r.style.opacity = "0";
+      return r;
+    });
+  }
   var mockA = function () { return mocks.find(function (m) { return m.root.getAttribute("data-ai") === "a"; }); };
   var mockB = function () { return mocks.find(function (m) { return m.root.getAttribute("data-ai") === "b"; }); };
 
   var SKILL_NAME = "atendimento-whatsapp";
+  // Rótulos das telas nas Aulas 4 e 5 (conferidos nas fontes oficiais; ver aulas.js > FONTES).
+  var CONN = {
+    a: { lista: "Customize › Connectors", botao: "Connect" },
+    b: { lista: "Plugins", botao: "Connect" },
+    pacote: "Claude: Customize › Plugins (planos pagos) · ChatGPT: Plugins, na barra lateral",
+    onde: [
+      ["Claude grátis", "Conectores", "Conectores do diretório (Agenda, Gmail, Drive) + 1 conector próprio. Plugins do diretório: só nos pagos.", true],
+      ["Claude pago", "Completo", "Conectores, conectores próprios e plugins.", false],
+      ["ChatGPT Plus", "Diretório", "Vê o diretório de plugins; cada plugin depende do plano. Sem servidor MCP próprio.", true],
+      ["ChatGPT Business, Enterprise, Edu", "Completo", "Plugins e servidor MCP próprio (só na web).", false],
+    ],
+  };
+  var TECH = [
+    ["Claude Code: onde ficam", "pastas", "~/.claude/skills/ (suas) · .claude/skills/ (do projeto)"],
+    ["Claude Code: usar", "comando", "/nome-da-skill · /skills lista todas"],
+    ["Claude Code: plugin", "comando", "/plugin install nome@marketplace"],
+    ["Codex", "pasta", ".agents/skills/ · chame com $nome"],
+  ];
   var LONG = "Responde esse cliente no tom da loja: simpático, sem gíria, fala do horário, oferece entrega e assina “Equipe Doce Lar”…";
   var ASK = "Responde: “tem bolo sem glúten?”";
   var ANSWER = "Oi! Temos sim: o de laranja sai sem glúten às sextas. Entregamos no bairro até as 18h. Quer que eu reserve um? — Equipe Doce Lar";
@@ -901,6 +945,286 @@
         await anim(rows, { opacity: [0, 1], x: [-14, 0] }, { duration: 0.4, delay: stagger(0.25) });
         if (!ok()) return;
         await anim(foot, { opacity: [0, 1], y: [8, 0] }, { duration: 0.4 });
+      },
+    ],
+    4: [
+      // 1. Sem conector, ela não vê seus apps
+      async function (ok) {
+        var q = "O que eu tenho na agenda amanhã?";
+        await both(function (m, k) { return wait(k * 250).then(function () { return typeInto(m.typed, q, 32); }); });
+        if (!ok()) return;
+        await wait(250); if (!ok()) return;
+        mocks.forEach(function (m) { m.typed.textContent = ""; });
+        await anim(mocks.map(function (m) { return bubble(m, "u", q); }), { opacity: [0, 1], y: [10, 0] }, { duration: 0.35 });
+        if (!ok()) return;
+        var rs = mocks.map(function (m) { var r = bubble(m, "a", ""); r.style.opacity = "1"; return r; });
+        await Promise.all(rs.map(function (r) { return typeInto(r.querySelector(".msg-text"), "Não tenho acesso à sua agenda. Se você colar os compromissos aqui, eu organizo.", 45); }));
+        if (!ok()) return;
+        await stamp("Ela não vê seus apps");
+      },
+
+      // 2. Conector: você dá a chave de um app
+      async function (ok) {
+        var A = CONN.a, B = CONN.b;
+        var rows = mocks.map(function (m) {
+          var c = m.root.getAttribute("data-ai") === "a" ? A : B;
+          m.shelfTitle.textContent = c.lista;
+          m.shelf.classList.add("is-open");
+          return [connRow(m, "Google Agenda", c.botao), connRow(m, "Gmail", c.botao), connRow(m, "Google Drive", c.botao)];
+        });
+        await anim(mocks.map(function (m) { return m.shelf; }), { opacity: [0, 1], y: [-8, 0] }, { duration: 0.35 });
+        if (!ok()) return;
+        await wait(500); if (!ok()) return;
+        rows.forEach(function (r) { r[0].classList.add("is-hl"); });
+        await anim(rows.map(function (r) { return r[0]; }), { scale: [1, 1.05, 1] }, { duration: 0.45 });
+        if (!ok()) return;
+        var perms = mocks.map(function (m) {
+          var who = m.root.getAttribute("data-ai") === "a" ? "o Claude" : "o ChatGPT";
+          return permission(m, "Permitir acesso à sua agenda?", "Você escolhe o que " + who + " pode ver e fazer. Dá pra desligar quando quiser.", "Permitir");
+        });
+        await anim(perms, { opacity: [0, 1], scale: [0.92, 1] }, { duration: 0.35 });
+        if (!ok()) return;
+        await wait(900); if (!ok()) return;
+        await anim(perms.map(function (p) { return p.querySelector(".perm-btn"); }), { scale: [1, 0.92, 1] }, { duration: 0.3 });
+        await anim(perms, { opacity: [1, 0] }, { duration: 0.25 });
+        perms.forEach(function (p) { p.remove(); });
+        rows.forEach(function (r) { connect(r[0]); });
+        await anim(rows.map(function (r) { return r[0].querySelector(".conn-btn"); }), { scale: [0.7, 1] }, { type: "spring", bounce: 0.5, duration: 0.5 });
+      },
+
+      // 3. Agora ela consulta sua agenda
+      async function (ok) {
+        mocks.forEach(function (m) {
+          var c = m.root.getAttribute("data-ai") === "a" ? CONN.a : CONN.b;
+          m.shelfTitle.textContent = c.lista;
+          m.shelf.classList.add("is-open");
+          connect(connRow(m, "Google Agenda", c.botao));
+        });
+        var q = "O que eu tenho na agenda amanhã?";
+        await both(function (m, k) { return wait(k * 250).then(function () { return typeInto(m.typed, q, 32); }); });
+        if (!ok()) return;
+        await wait(250); if (!ok()) return;
+        mocks.forEach(function (m) { m.typed.textContent = ""; });
+        await anim(mocks.map(function (m) { return bubble(m, "u", q); }), { opacity: [0, 1], y: [10, 0] }, { duration: 0.35 });
+        if (!ok()) return;
+        await anim(mocks.map(function (m) { return chip(m, "Consultando Google Agenda"); }), { opacity: [0, 1], scale: [0.85, 1] }, { type: "spring", bounce: 0.4, duration: 0.5 });
+        if (!ok()) return;
+        var rs = mocks.map(function (m) { var r = bubble(m, "a", ""); r.style.opacity = "1"; return r; });
+        await Promise.all(rs.map(function (r) { return typeInto(r.querySelector(".msg-text"), "Amanhã: 9h reunião com o fornecedor e 14h entrega da encomenda da Ana. Você está livre das 10h às 12h.", 48); }));
+      },
+
+      // 4. Plugin: o pacote pronto
+      async function (ok) {
+        var wrap = el("div", "pack");
+        var head = el("div", "pack-head");
+        head.append(el("span", "pack-k", "Plugin"), el("span", "pack-n", "Atendimento completo"));
+        var items = rowsIn("pack-item", [
+          [["pi-t", "skill"], ["pi-n", "atendimento-whatsapp"]],
+          [["pi-t", "skill"], ["pi-n", "cobranca-gentil"]],
+          [["pi-t", "conector"], ["pi-n", "Gmail"]],
+          [["pi-t", "conector"], ["pi-n", "Google Agenda"]],
+        ]);
+        var btn = el("span", "pack-btn", "Instalar");
+        var paths = el("p", "where-foot", CONN.pacote);
+        btn.style.opacity = "0"; paths.style.opacity = "0";
+        wrap.append(head); items.forEach(function (i) { wrap.append(i); }); wrap.append(btn);
+        var outer = el("div", "pack-outer"); outer.append(wrap, paths);
+        board.append(outer);
+        await showBoard(); if (!ok()) return;
+        await anim(wrap, { opacity: [0, 1], y: [16, 0] }, { duration: 0.4 });
+        await anim(items, { opacity: [0, 1], x: [-10, 0] }, { duration: 0.3, delay: stagger(0.25) });
+        if (!ok()) return;
+        await anim(btn, { opacity: [0, 1] }, { duration: 0.3 });
+        await wait(500); if (!ok()) return;
+        await anim(btn, { scale: [1, 0.9, 1] }, { duration: 0.3 });
+        btn.textContent = "Instalado: tudo de uma vez"; btn.classList.add("is-on");
+        await anim(paths, { opacity: [0, 1], y: [8, 0] }, { duration: 0.4 });
+      },
+
+      // 5. Conecte com cuidado
+      async function (ok) {
+        var wrap = el("div", "rules");
+        var cards = [
+          ["Só o que precisa", "Cada conector é uma porta aberta pros seus dados."],
+          ["Leia a permissão", "Ver é diferente de enviar, editar ou apagar."],
+          ["Desligue o que não usa", "Conector parado não precisa ficar ligado."],
+          ["Desconfie de ordem escondida", "Um email ou documento pode trazer instruções pra IA. Confira antes de deixar ela enviar ou apagar algo."],
+        ].map(function (r) {
+          var c = el("div", "rule");
+          c.append(el("p", "rule-t", r[0]), el("p", "rule-s", r[1]));
+          c.style.opacity = "0"; wrap.append(c); return c;
+        });
+        var foot = el("p", "where-foot", "Dado de cliente conectado também é responsabilidade sua (LGPD).");
+        foot.style.opacity = "0";
+        var outer = el("div", "rules-outer"); outer.append(wrap, foot);
+        board.append(outer);
+        await showBoard(); if (!ok()) return;
+        await anim(cards, { opacity: [0, 1], y: [14, 0] }, { duration: 0.4, delay: stagger(0.35) });
+        if (!ok()) return;
+        await anim(cards[3], { scale: [1, 1.04, 1] }, { duration: 0.5 });
+        await anim(foot, { opacity: [0, 1] }, { duration: 0.4 });
+      },
+
+      // 6. Onde funciona hoje
+      async function (ok) {
+        var wrap = el("div", "where");
+        var h = el("p", "where-h", "Conectores e plugins · " + D.VERIFICADO_EM);
+        var rows = CONN.onde.map(function (r) {
+          var row = el("div", "where-row");
+          row.append(el("span", "where-name", r[0]), el("span", "where-pill" + (r[3] ? " part" : ""), r[1]), el("span", "where-note", r[2]));
+          row.style.opacity = "0";
+          return row;
+        });
+        h.style.opacity = "0";
+        wrap.append(h); rows.forEach(function (r) { wrap.append(r); });
+        board.append(wrap);
+        await showBoard(); if (!ok()) return;
+        await anim(h, { opacity: [0, 1] }, { duration: 0.3 });
+        await anim(rows, { opacity: [0, 1], x: [-14, 0] }, { duration: 0.4, delay: stagger(0.25) });
+      },
+    ],
+
+    5: [
+      // 1. Uma skill é só uma pasta
+      async function (ok) {
+        var wrap = el("div", "anat");
+        var rows = rowsIn("anat-row", [
+          [["an-f", "atendimento-whatsapp/"], ["an-n", "o nome da pasta é o nome da skill"]],
+          [["an-f", "├ SKILL.md"], ["an-n", "obrigatório: cabeçalho + instruções"]],
+          [["an-f", "├ references/"], ["an-n", "textos de apoio: cardápio, tabela de preços"]],
+          [["an-f", "├ scripts/"], ["an-n", "código que a IA roda"]],
+          [["an-f", "└ assets/"], ["an-n", "modelos e imagens"]],
+        ]);
+        rows.forEach(function (r) { wrap.append(r); });
+        board.append(wrap);
+        await showBoard(); if (!ok()) return;
+        await anim(rows, { opacity: [0, 1], x: [-12, 0] }, { duration: 0.35, delay: stagger(0.35) });
+        if (!ok()) return;
+        rows[1].classList.add("is-hl");
+        await anim(rows[1], { scale: [1, 1.03, 1] }, { duration: 0.45 });
+      },
+
+      // 2. O cabeçalho decide tudo
+      async function (ok) {
+        var wrap = el("div", "fm");
+        var lines = rowsIn("fm-line", [
+          [["fm-c", "---"]],
+          [["fm-k", "name: "], ["fm-v", "atendimento-whatsapp"]],
+          [["fm-k", "description: "], ["fm-v", "Responde clientes no tom da loja. Use quando pedirem pra responder um cliente."]],
+          [["fm-c", "---"]],
+          [["fm-c", "# Atendimento no WhatsApp"]],
+          [["fm-c", "1. No máximo 4 linhas…"]],
+        ]);
+        lines.forEach(function (l) { wrap.append(l); });
+        var notes = rowsIn("fm-note", [
+          "name: minúsculas e hífen, até 64 caracteres, igual ao nome da pasta",
+          "description: o quê + quando usar. No claude.ai, fique abaixo de 200 caracteres",
+          "Depois do segundo ---: instruções em texto normal",
+        ]);
+        var outer = el("div", "fm-outer"); outer.append(wrap);
+        var nb = el("div", "fm-notes"); notes.forEach(function (n) { nb.append(n); }); outer.append(nb);
+        board.append(outer);
+        await showBoard(); if (!ok()) return;
+        await anim(lines, { opacity: [0, 1] }, { duration: 0.3, delay: stagger(0.15) });
+        if (!ok()) return;
+        for (var i = 0; i < 3; i++) {
+          var target = [lines[1], lines[2], lines[4]][i];
+          target.classList.add("is-hl");
+          await anim(notes[i], { opacity: [0, 1], x: [10, 0] }, { duration: 0.35 });
+          await wait(600); if (!ok()) return;
+          target.classList.remove("is-hl");
+        }
+      },
+
+      // 3. Ela lê em três camadas
+      async function (ok) {
+        var wrap = el("div", "layers");
+        var cards = [
+          ["1 · Sempre", "Nome e descrição de todas as skills ligadas (uns 100 tokens cada)."],
+          ["2 · Quando a skill é ativada", "O corpo do SKILL.md (recomendado: menos de 5.000 tokens)."],
+          ["3 · Só se precisar", "Os arquivos extras: referências, scripts, modelos."],
+        ].map(function (c, i) {
+          var d = el("div", "layer l" + (i + 1));
+          d.append(el("p", "layer-t", c[0]), el("p", "layer-s", c[1]));
+          d.style.opacity = "0"; wrap.append(d); return d;
+        });
+        var foot = el("p", "where-foot", "Por isso dá pra ter dezenas de skills sem deixar a IA lenta.");
+        foot.style.opacity = "0";
+        var outer = el("div", "layers-outer"); outer.append(wrap, foot);
+        board.append(outer);
+        await showBoard(); if (!ok()) return;
+        for (var i = 0; i < cards.length; i++) {
+          await anim(cards[i], { opacity: [0, 1], y: [16, 0] }, { duration: 0.4 });
+          await wait(700); if (!ok()) return;
+        }
+        await anim(foot, { opacity: [0, 1] }, { duration: 0.4 });
+      },
+
+      // 4. Script: conta certa, sem chute
+      async function (ok) {
+        var wrap = el("div", "script");
+        var ask = el("p", "bd-req", "Pedido: “quanto fica o frete pra 7 km?”");
+        var code = el("div", "code");
+        code.append(el("p", "code-h", "scripts/frete.py"));
+        var lines = rowsIn("code-l", ["km = 7", "taxa = 5 + km * 1.5", "print(f\"R$ {taxa:.2f}\")"]);
+        lines.forEach(function (l) { code.append(l); });
+        var out = el("p", "code-out", "→ R$ 15.50");
+        out.style.opacity = "0"; code.append(out);
+        ask.style.opacity = "0"; code.style.opacity = "0";
+        wrap.append(ask, code);
+        board.append(wrap);
+        await showBoard(); if (!ok()) return;
+        await anim(ask, { opacity: [0, 1], y: [-8, 0] }, { duration: 0.35 });
+        await anim(code, { opacity: [0, 1], y: [12, 0] }, { duration: 0.35 });
+        await anim(lines, { opacity: [0, 1] }, { duration: 0.25, delay: stagger(0.3) });
+        if (!ok()) return;
+        await wait(400); if (!ok()) return;
+        await anim(out, { opacity: [0, 1], scale: [0.8, 1] }, { type: "spring", bounce: 0.5, duration: 0.5 });
+        if (!ok()) return;
+        await stamp("Rodou, não chutou");
+      },
+
+      // 5. MCP: a tomada dos conectores
+      async function (ok) {
+        var wrap = el("div", "mcp");
+        var left = el("div", "mcp-ai"); left.append(el("span", null, "Claude"), el("span", null, "ChatGPT"));
+        var mid = el("div", "mcp-mid"); mid.append(el("span", "mcp-line"), el("span", "mcp-tag", "MCP"));
+        var right = el("div", "mcp-apps");
+        var apps = ["Google Agenda", "Gmail", "Supabase", "Seu sistema"].map(function (n) { var a = el("span", "mcp-app", n); a.style.opacity = "0"; right.append(a); return a; });
+        left.style.opacity = "0"; mid.style.opacity = "0";
+        wrap.append(left, mid, right);
+        var foot = el("p", "where-foot", "Conector = servidor MCP. Plugin = skills + conectores num pacote só.");
+        foot.style.opacity = "0";
+        var outer = el("div", "mcp-outer"); outer.append(wrap, foot);
+        board.append(outer);
+        await showBoard(); if (!ok()) return;
+        await anim(left, { opacity: [0, 1], x: [-12, 0] }, { duration: 0.35 });
+        await anim(mid, { opacity: [0, 1] }, { duration: 0.3 });
+        await anim(mid.querySelector(".mcp-line"), { scaleX: [0, 1] }, { duration: 0.6 });
+        await anim(apps, { opacity: [0, 1], x: [12, 0] }, { duration: 0.3, delay: stagger(0.2) });
+        if (!ok()) return;
+        await anim(foot, { opacity: [0, 1] }, { duration: 0.4 });
+      },
+
+      // 6. No Claude Code e no Codex
+      async function (ok) {
+        var wrap = el("div", "where");
+        var h = el("p", "where-h", "Pra quem programa · " + D.VERIFICADO_EM);
+        var rows = TECH.map(function (r) {
+          var row = el("div", "where-row");
+          row.append(el("span", "where-name", r[0]), el("span", "where-pill", r[1]), el("code", "where-note", r[2]));
+          row.style.opacity = "0";
+          return row;
+        });
+        var foot = el("p", "where-foot", "O mesmo SKILL.md serve no chat e no terminal.");
+        h.style.opacity = "0"; foot.style.opacity = "0";
+        wrap.append(h); rows.forEach(function (r) { wrap.append(r); }); wrap.append(foot);
+        board.append(wrap);
+        await showBoard(); if (!ok()) return;
+        await anim(h, { opacity: [0, 1] }, { duration: 0.3 });
+        await anim(rows, { opacity: [0, 1], x: [-14, 0] }, { duration: 0.4, delay: stagger(0.25) });
+        if (!ok()) return;
+        await anim(foot, { opacity: [0, 1] }, { duration: 0.4 });
       },
     ],
   };

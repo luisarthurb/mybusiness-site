@@ -151,8 +151,98 @@ window.CURSO = {
         interesse: "skills-pagas",
       },
     },
-    { n: 4, titulo: "Plugins e conectores: a IA nos seus apps", min: 4, pronta: false, cenas: [] },
-    { n: 5, titulo: "Por baixo do capô (opcional)", min: 4, pronta: false, tecnica: true, cenas: [] },
+    {
+      n: 4,
+      titulo: "Plugins e conectores: a IA nos seus apps",
+      min: 4,
+      pronta: true,
+      telas: {
+        a: { badge: "Conectores: todos os planos", shelf: "Customize › Connectors" },
+        b: { badge: "Plus: diretório de plugins", shelf: "Plugins" },
+      },
+      cenas: [
+        {
+          titulo: "Sem conector, ela não vê seus apps",
+          texto: "Por padrão, a IA só sabe o que você escreve na conversa. Agenda, email, planilhas: tudo fora do alcance dela.",
+        },
+        {
+          titulo: "Conector: você entrega a chave de um app",
+          texto: "No Claude: Customize › Connectors, clique no + e escolha o app (Google Agenda, Gmail, Drive), depois “Connect” e autorize. No ChatGPT: Plugins, na barra lateral › escolha › “Install plugin” › “Connect”.",
+        },
+        {
+          titulo: "Agora ela consulta seus dados",
+          texto: "Com o conector ligado, a IA busca a informação no app e responde. No Claude, dá pra ligar e desligar cada conector por conversa, no botão + do chat.",
+        },
+        {
+          titulo: "Plugin: o pacote pronto",
+          texto: "O plugin junta skills e conectores (no Claude, também comandos e agentes) e instala tudo de uma vez. No Claude: Customize › Plugins, nos planos pagos. No ChatGPT: Plugins, na barra lateral.",
+        },
+        {
+          titulo: "Conecte com cuidado",
+          texto: "Conecte só serviços de empresas confiáveis e leia o que está autorizando. Um email ou documento pode trazer instruções escondidas pra IA (o nome disso é prompt injection): antes de deixar ela enviar ou apagar algo, confira.",
+        },
+        {
+          titulo: "Onde funciona hoje",
+          texto: "O Claude grátis já usa os conectores do diretório e 1 conector próprio; plugins do diretório são dos planos pagos. No ChatGPT Plus, o diretório aparece, mas cada plugin depende do plano; servidor MCP próprio é só Business, Enterprise e Edu.",
+        },
+      ],
+      extras: [
+        {
+          titulo: "Pedido pra testar o conector",
+          sub: "Mande depois de conectar a sua agenda",
+          texto: "Usando a minha agenda, me diga o que eu tenho amanhã e sugira um horário livre de 1 hora pra uma reunião.",
+        },
+        {
+          titulo: "Checklist antes de conectar",
+          sub: "4 perguntas, 30 segundos",
+          texto: "Antes de conectar um app à IA:\n1. É de uma empresa confiável?\n2. O que estou autorizando: ver, enviar, editar ou apagar?\n3. Preciso disso ligado sempre, ou só hoje?\n4. Tem dado de cliente? Se tiver, a responsabilidade (LGPD) continua sendo minha.",
+        },
+      ],
+    },
+    {
+      n: 5,
+      titulo: "Por baixo do capô (opcional)",
+      min: 4,
+      pronta: true,
+      tecnica: true,
+      telas: {
+        a: { badge: "Claude Code: /skills", shelf: "Customize › Skills" },
+        b: { badge: "Codex: .agents/skills", shelf: "Plugins › Skills" },
+      },
+      cenas: [
+        {
+          titulo: "Uma skill é só uma pasta",
+          texto: "Dentro dela: o SKILL.md (obrigatório) e, se quiser, pastas de apoio. references/ pra textos de consulta, scripts/ pra código que a IA roda, assets/ pra modelos e imagens.",
+        },
+        {
+          titulo: "O cabeçalho decide tudo",
+          texto: "Entre os dois --- ficam name e description. name: minúsculas, números e hífen, até 64 caracteres, igual ao nome da pasta. description: o que faz e quando usar; o padrão aceita até 1.024 caracteres, mas no claude.ai fique abaixo de 200.",
+        },
+        {
+          titulo: "Ela lê em três camadas",
+          texto: "Primeiro, nome e descrição de todas as skills (uns 100 tokens cada). Quando uma é ativada, o corpo do SKILL.md (o recomendado é menos de 5.000 tokens). Os arquivos extras, só quando precisa.",
+        },
+        {
+          titulo: "Script: conta certa, sem chute",
+          texto: "Pra cálculo, conversão ou planilha, ponha um script em scripts/. A IA roda o código em vez de estimar. Precisa da execução de código ligada.",
+        },
+        {
+          titulo: "MCP: a tomada dos conectores",
+          texto: "MCP é um padrão aberto pra ligar apps de IA a sistemas externos. Cada conector é um servidor MCP. O plugin junta skills e conectores num pacote só.",
+        },
+        {
+          titulo: "No Claude Code e no Codex",
+          texto: "No Claude Code, suas skills ficam em ~/.claude/skills/ e as do projeto em .claude/skills/; chame com /nome-da-skill. Plugin: /plugin install nome@marketplace. No Codex: .agents/skills/ e $nome. O arquivo é o mesmo.",
+        },
+      ],
+      extras: [
+        {
+          titulo: "Esqueleto de SKILL.md",
+          sub: "Copie, troque o que está entre <> e salve numa pasta com o mesmo nome",
+          texto: "---\nname: <nome-da-skill>\ndescription: <O que ela faz>. Use quando o usuário pedir <situação>.\n---\n\n# <Nome da skill>\n\n## Quando usar\n<Em que situação essa skill entra.>\n\n## Passo a passo\n1. <Primeiro passo>\n2. <Segundo passo>\n\n## Formato da resposta\n<Tamanho, tom, estrutura.>\n\n## Nunca\n- <O que ela não pode fazer>",
+        },
+      ],
+    },
   ],
 
   // Skills prontas pra copiar. Texto no formato aberto (SKILL.md): name em minúsculas
@@ -262,5 +352,14 @@ window.CURSO = {
     { nome: "Padrão aberto Agent Skills", url: "https://agentskills.io/specification" },
     { nome: "Gemini: skills", url: "https://blog.google/products-and-platforms/products/gemini/automate-tasks-with-skills/" },
     { nome: "Microsoft 365 Copilot: skills em agentes", url: "https://learn.microsoft.com/en-us/microsoft-365-copilot/extensibility/agent-builder-add-skills" },
+    { nome: "Claude: conectores do diretório", url: "https://support.claude.com/en/articles/11176164-pre-built-integrations-using-remote-mcp" },
+    { nome: "Claude: conectores próprios (planos e limite do grátis)", url: "https://support.claude.com/en/articles/11175166-getting-started-with-custom-connectors-using-remote-mcp" },
+    { nome: "Claude: plugins", url: "https://claude.com/docs/plugins/overview" },
+    { nome: "ChatGPT: plugins", url: "https://help.openai.com/en/articles/20001256-plugins-in-chatgpt" },
+    { nome: "ChatGPT: modo desenvolvedor e MCP (planos)", url: "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt" },
+    { nome: "Claude Code: skills (pastas e comandos)", url: "https://code.claude.com/docs/en/skills" },
+    { nome: "Claude Code: plugins", url: "https://code.claude.com/docs/en/plugins" },
+    { nome: "Codex: skills", url: "https://learn.chatgpt.com/docs/build-skills" },
+    { nome: "MCP: o que é", url: "https://modelcontextprotocol.io/introduction" },
   ],
 };
