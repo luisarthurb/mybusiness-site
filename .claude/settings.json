@@ -8,7 +8,12 @@
     ],
     "ask": [
       "mcp__Vercel__create_deployment",
-      "mcp__Vercel__request_promote"
+      "mcp__Vercel__request_promote",
+      "Bash(git push origin main:*)",
+      "Bash(git push origin HEAD:main:*)",
+      "Bash(git push * main:*)",
+      "mcp__github__merge_pull_request",
+      "mcp__github__push_files"
     ]
   }
 }
