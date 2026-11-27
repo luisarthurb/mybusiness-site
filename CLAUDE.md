@@ -9,6 +9,8 @@ o build da Vercel É o `scripts/check.sh` — se ele falhar, nada é publicado. 
 - Produtos, preços, links, contato e endpoints moram SÓ em `public/config.js`. Não espalhar dados no HTML.
 - `SHOW_SHOWCASE: false` enquanto os produtos forem exemplos. Só ligar com produto real.
 - Novo domínio externo (fonte, script, API) exige atualizar a CSP em `vercel.json`, senão quebra em produção.
+- Fontes moram em `public/fonts` (`/fonts/fonts.css`); nada de Google Fonts. Prévia de link: `og.html` → `public/img/og.png`
+  (gerar com `make_og.js` da skill landing-page). `robots.txt`/`sitemap.xml` em `public/`.
 - NUNCA colocar no código do site link direto de arquivo pago (Google Drive, .zip, .pdf).
   Produto pago é entregue pelo checkout (Stripe), nunca pelo site.
 - Nada de adrianobinhara.com: nem texto, nem imagem, nem logo. Ele é referência de estrutura, não fonte.

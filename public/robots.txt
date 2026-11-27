@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /sair
+
+Sitemap: https://mybusiness.ia.br/sitemap.xml

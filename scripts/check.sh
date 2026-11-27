@@ -11,4 +11,8 @@ check 'sb_secret_|service_role|eyJhbGci' "chave secreta/JWT do Supabase no códi
 if grep -q 'CONTACT_EMAIL: ""' public/config.js; then
   echo "BLOQUEADO: CONTACT_EMAIL vazio em public/config.js (a página de privacidade exige contato)"; fail=1
 fi
+check 'fonts\.googleapis\.com|fonts\.gstatic\.com' "Google Fonts (as fontes moram em public/fonts; a CSP bloqueia o Google)"
+if grep -rn -E ' style="|<script>[^<]' public --include=*.html; then echo "BLOQUEADO: style/script inline no HTML (a CSP bloqueia)"; fail=1; fi
+grep -q 'property="og:image" content="https://mybusiness.ia.br/' public/index.html || { echo "BLOQUEADO: index.html sem og:image absoluto (prévia de link no Instagram/WhatsApp)"; fail=1; }
+[ -f public/img/og.png ] || { echo "BLOQUEADO: public/img/og.png não existe (gere com make_og.js a partir de og.html)"; fail=1; }
 [ $fail -eq 0 ] && echo "check.sh OK" || exit 1
