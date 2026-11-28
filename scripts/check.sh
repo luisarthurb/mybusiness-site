@@ -8,6 +8,7 @@ check() { if grep -n -i -E "$1" $FILES; then echo "BLOQUEADO: $2"; fail=1; fi; }
 check 'drive\.google\.com|dropbox\.com|\.zip["'"'"']|\.pdf["'"'"']' "link direto de arquivo no código público"
 check 'adrianobinhara' "material de terceiro"
 check 'sb_secret_|service_role|eyJhbGci' "chave secreta/JWT do Supabase no código público (use só sb_publishable_)"
+check 'sk_(live|test)_[0-9A-Za-z]{8,}|rk_(live|test)_[0-9A-Za-z]{8,}|whsec_[0-9A-Za-z]{8,}' "chave secreta do Stripe no código público (o site usa só Payment Link)"
 if grep -q 'CONTACT_EMAIL: ""' public/config.js; then
   echo "BLOQUEADO: CONTACT_EMAIL vazio em public/config.js (a página de privacidade exige contato)"; fail=1
 fi
