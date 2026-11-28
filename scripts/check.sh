@@ -5,7 +5,12 @@ cd "$(dirname "$0")/.." || exit 1
 FILES=$(find public -type f \( -name '*.html' -o -name '*.js' -o -name '*.css' -o -name '*.md' -o -name '*.json' \) | sort)
 fail=0
 check() { if grep -n -i -E "$1" $FILES; then echo "BLOQUEADO: $2"; fail=1; fi; }
-check 'drive\.google\.com|dropbox\.com|\.zip["'"'"']|\.pdf["'"'"']' "link direto de arquivo no código público"
+# Link direto de arquivo: bloqueado, EXCETO skill grátis em /downloads/gratis/ (pago nunca vai pra lá).
+if grep -n -i -E 'drive\.google\.com|dropbox\.com|\.zip["'"'"']|\.pdf["'"'"']' $FILES | grep -v -E '/downloads/gratis/[a-z0-9-]+\.zip["'"'"']'; then
+  echo "BLOQUEADO: link direto de arquivo no código público (só skill grátis em /downloads/gratis/ é permitida)"; fail=1
+fi
+extra=$(find public -name '*.zip' -not -path 'public/downloads/gratis/*')
+[ -n "$extra" ] && { echo "BLOQUEADO: .zip fora de public/downloads/gratis/: $extra"; fail=1; }
 check 'adrianobinhara' "material de terceiro"
 check 'sb_secret_|service_role|eyJhbGci' "chave secreta/JWT do Supabase no código público (use só sb_publishable_)"
 if grep -q 'CONTACT_EMAIL: ""' public/config.js; then

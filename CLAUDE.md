@@ -13,6 +13,7 @@ o build da Vercel É o `scripts/check.sh` — se ele falhar, nada é publicado. 
   (gerar com `make_og.js` da skill landing-page). `robots.txt`/`sitemap.xml` em `public/`.
 - NUNCA colocar no código do site link direto de arquivo pago (Google Drive, .zip, .pdf).
   Produto pago é entregue pelo checkout (Stripe), nunca pelo site.
+  Exceção: skill GRÁTIS em `public/downloads/gratis/<id>.zip` (só .zip, nunca a pasta-fonte com SKILL.md).
 - Nada de adrianobinhara.com: nem texto, nem imagem, nem logo. Ele é referência de estrutura, não fonte.
 - Deploy em produção, compra de domínio e qualquer ação no Meta Ads exigem OK explícito do Luis.
 - Rodar `bash scripts/check.sh` antes de qualquer deploy. Falhou = não sobe.

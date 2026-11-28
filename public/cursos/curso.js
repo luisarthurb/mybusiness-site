@@ -930,6 +930,10 @@
     f.append(cb);
     row("Como pedir", f);
     row("Funciona em", document.createTextNode("Claude (todos os planos) · ChatGPT Business, Enterprise e Edu · Gemini · Copilot"));
+    if (s.zip) { // pacote completo pra subir em Customize › Skills (aula 3)
+      var dl = el("a", "copy-btn", "Baixar .zip grátis"); dl.href = s.zip; dl.setAttribute("download", "");
+      row("Instalar", dl);
+    }
     renderSkillThumbs();
   }
   function renderSkillThumbs() {

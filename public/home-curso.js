@@ -73,12 +73,20 @@
   // ---------- Skills prontas ----------
   var cards = $("skill-cards");
   (D.SKILLS || []).forEach(function (s) {
-    var a = el("a", "skill-card");
-    a.href = "/cursos/skills#skills";
-    if (s.area) a.append(el("span", "skill-area", s.area));
-    a.append(el("span", "skill-title", s.titulo));
-    if (s.desc) a.append(el("span", "skill-desc", s.desc));
-    a.append(el("span", "skill-go", "Copiar no minicurso →"));
-    cards.append(a);
+    var card = el("article", "skill-card");
+    if (s.area) card.append(el("span", "skill-area", s.area));
+    card.append(el("h4", "skill-title", s.titulo));
+    if (s.desc) card.append(el("p", "skill-desc", s.desc));
+    var acts = el("div", "skill-actions");
+    if (s.zip) {
+      var dl = el("a", "skill-dl", "Baixar .zip grátis");
+      dl.href = s.zip; dl.setAttribute("download", "");
+      acts.append(dl);
+    }
+    var go = el("a", "skill-go", s.zip ? "Como instalar →" : "Copiar no minicurso →");
+    go.href = "/cursos/skills#skills";
+    acts.append(go);
+    card.append(acts);
+    cards.append(card);
   });
 })();
