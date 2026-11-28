@@ -98,15 +98,7 @@
 
       btn.disabled = true;
       btn.textContent = "Enviando…";
-      fetch(C.SUPABASE_URL + "/rest/v1/rpc/subscribe_mybusiness_newsletter", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "apikey": C.SUPABASE_PUBLISHABLE_KEY,
-          "Content-Profile": "mypan"
-        },
-        body: JSON.stringify({ p_response: payload })
-      }).then(function (res) {
+      subscribe(payload).then(function (res) {
         if (res.ok) { success(); return; }
         if (res.status === 400) {
           input.setAttribute("aria-invalid", "true");
@@ -125,5 +117,19 @@
     return form;
   }
 
-  window.MB = { el: el, copyText: copyText, subscribeForm: subscribeForm };
+  // Assina a newsletter (mypan2 › subscribe_mybusiness_newsletter). Devolve a Response do fetch.
+  // payload: { email, consent: true, interest? }
+  function subscribe(payload) {
+    return fetch(C.SUPABASE_URL + "/rest/v1/rpc/subscribe_mybusiness_newsletter", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "apikey": C.SUPABASE_PUBLISHABLE_KEY,
+        "Content-Profile": "mypan"
+      },
+      body: JSON.stringify({ p_response: payload })
+    });
+  }
+
+  window.MB = { el: el, copyText: copyText, subscribeForm: subscribeForm, subscribe: subscribe };
 })();

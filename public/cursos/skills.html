@@ -18,6 +18,7 @@
   <script src="/vendor/motion.min.js" defer></script>
   <script src="/cursos/aulas.js" defer></script>
   <script src="/cursos/curso.js" defer></script>
+  <script src="/cursos/acesso.js" defer></script>
 </head>
 <body class="curso">
   <a class="skip" href="#player">Pular para a aula</a>
@@ -26,6 +27,7 @@
     <div class="wrap header-inner">
       <a class="brand" href="/" aria-label="mybusiness, início"><span class="wordmark">MYBUSINESS</span></a>
       <span class="header-tag">Minicurso · Skills de IA</span>
+      <span class="acct" id="acct" hidden><span class="acct-email" id="acct-email"></span><button class="acct-out" type="button" id="logout">Sair</button></span>
     </div>
   </header>
 
@@ -50,6 +52,35 @@
       </div>
     </section>
 
+    <!-- PORTÃO: só aparece com o login ligado (config.js > COURSE_AUTH) e sem sessão -->
+    <section class="gate" id="gate" hidden aria-labelledby="gate-title">
+      <div class="wrap">
+        <div class="gate-card">
+          <div class="gate-text">
+            <h2 id="gate-title">Entre pra assistir</h2>
+            <p class="gate-sub">Grátis. Deixe seu email e mandamos um link de acesso, sem senha.</p>
+            <ol class="gate-list" id="gate-list" aria-label="Aulas do minicurso"></ol>
+          </div>
+          <div class="gate-box">
+            <form class="gate-form" id="gate-form" novalidate>
+              <label class="gate-label" for="gate-email">Seu email</label>
+              <input type="email" id="gate-email" name="email" autocomplete="email" inputmode="email" required placeholder="seu@email.com" aria-describedby="gate-msg gate-consent">
+              <button class="btn btn-primary" type="submit" data-news="1">Entrar e receber a newsletter</button>
+              <button class="gate-alt" type="submit" data-news="0">Prefiro só o curso, sem newsletter</button>
+              <p class="consent" id="gate-consent">No botão vermelho você também aceita receber a newsletter semanal da mybusiness (sai quando quiser, pelo link em todo email). Nos dois casos, usamos seu email só pra criar o seu acesso. <a href="/privacidade">Privacidade</a></p>
+              <p class="msg" id="gate-msg" role="status"></p>
+            </form>
+            <div class="gate-sent" id="gate-sent" hidden tabindex="-1">
+              <p class="gate-sent-t">Link enviado pra <strong id="gate-sent-email"></strong></p>
+              <p class="gate-sent-s">Abra o email <strong>neste aparelho</strong> e clique no link. Não chegou em 2 minutos? Olhe o spam ou peça de novo.</p>
+              <button class="btn-out" type="button" id="gate-again">Usar outro email</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div id="course-body">
     <!-- ABAS -->
     <div class="wrap">
       <div class="seg" role="tablist" aria-label="Partes do curso" id="tabs">
@@ -242,6 +273,7 @@
         </div>
         <div class="end-form" id="end-form"></div>
       </div>
+    </div>
     </div>
   </main>
 

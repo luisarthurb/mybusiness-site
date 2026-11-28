@@ -10,7 +10,14 @@ o build da Vercel É o `scripts/check.sh` — se ele falhar, nada é publicado. 
 - `SHOW_SHOWCASE: false` enquanto os produtos forem exemplos. Só ligar com produto real.
 - Novo domínio externo (fonte, script, API) exige atualizar a CSP em `vercel.json`, senão quebra em produção.
 - NUNCA colocar no código do site link direto de arquivo pago (Google Drive, .zip, .pdf).
-  Produto pago é entregue pelo checkout (Stripe), nunca pelo site.
+  Produto pago: compra pelo checkout (Stripe Payment Link); entrega só na área logada, por link
+  temporário gerado depois de o pagamento ser confirmado. Nada pago em `public/` nem no repo.
+  (Regra alterada com OK do Luis em 28/11/2026 por causa do plano vitalício.)
+- Chave secreta do Stripe (sk_/rk_/whsec_) NUNCA no site; o site só usa Payment Link. check.sh bloqueia.
+- Login do minicurso: Supabase Auth no projeto "mybusiness", NUNCA no `mypan2` (lá vivem os usuários
+  do app mypan). Liga/desliga em `config.js` › `COURSE_AUTH.ENABLED`.
+- Conteúdo trancado (texto das aulas, skills prontas) não vai em `public/` com o login ligado.
+  check.sh bloqueia. Repo público = o que já foi commitado continua visível no histórico.
 - Nada de adrianobinhara.com: nem texto, nem imagem, nem logo. Ele é referência de estrutura, não fonte.
 - Deploy em produção, compra de domínio e qualquer ação no Meta Ads exigem OK explícito do Luis.
 - Rodar `bash scripts/check.sh` antes de qualquer deploy. Falhou = não sobe.

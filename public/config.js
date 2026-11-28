@@ -15,6 +15,18 @@ window.CONFIG = {
   CONTACT_NAME: "Luis Arthur Bertho",
   CONTACT_EMAIL: "contato@mypan.com.br",
 
+  // Login do minicurso /cursos/skills (projeto Supabase "mybusiness", NÃO o mypan2).
+  // ENABLED: false = curso aberto, com o texto de cursos/aulas.js.
+  // Só ligar quando existir: projeto criado + SMTP (Resend) + URL de retorno no Auth +
+  // conteúdo no banco (tabela course_content) + domínio do projeto na CSP do vercel.json.
+  // A chave aqui é a PUBLICÁVEL do projeto novo (sb_publishable_...). Nunca a secreta.
+  COURSE_AUTH: {
+    ENABLED: false,
+    SUPABASE_URL: "",
+    PUBLISHABLE_KEY: "",
+    COURSE: "skills",
+  },
+
   // false = esconde a vitrine (enquanto os produtos abaixo são só exemplos).
   SHOW_SHOWCASE: false,
 

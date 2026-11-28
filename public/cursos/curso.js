@@ -1,11 +1,19 @@
 // Motor do minicurso: abas, progresso (salvo no aparelho), player de cenas animadas.
-// Texto mora em aulas.js. Animação usa Motion (local em /vendor, a CSP não aceita CDN).
+// Animação usa Motion (local em /vendor, a CSP não aceita CDN).
+// Conteúdo: login desligado -> cursos/aulas.js; login ligado -> acesso.js busca no banco
+// e chama MBCurso.start(conteúdo) depois que a pessoa entra.
 (function () {
   "use strict";
-  var D = window.CURSO;
   var MB = window.MB;
   var M = window.Motion;
-  if (!D || !MB) return;
+  var started = false;
+  window.MBCurso = { start: start };
+  var AUTH = (window.CONFIG || {}).COURSE_AUTH || {};
+  if (!AUTH.ENABLED) start(window.CURSO);
+
+  function start(D) {
+  if (started || !D || !MB) return;
+  started = true;
 
   var $ = function (id) { return document.getElementById(id); };
   var el = MB.el;
@@ -1286,7 +1294,7 @@
     id: "f-curso",
     interest: "curso-skills",
     button: "Assinar grátis",
-    done: "Pronto, você está na lista. As próximas aulas chegam no seu email.",
+    done: "Pronto, você está na lista. Novas skills e aulas chegam no seu email.",
   }));
   $("year").textContent = new Date().getFullYear();
 
@@ -1297,4 +1305,5 @@
   renderLesson();
   var h = (location.hash || "").slice(1);
   if (h === "skills" || h === "kit") selectTab(h); else selectTab("aulas");
+  }
 })();

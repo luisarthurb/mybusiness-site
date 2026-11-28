@@ -12,4 +12,13 @@ check 'sk_(live|test)_[0-9A-Za-z]{8,}|rk_(live|test)_[0-9A-Za-z]{8,}|whsec_[0-9A
 if grep -q 'CONTACT_EMAIL: ""' public/config.js; then
   echo "BLOQUEADO: CONTACT_EMAIL vazio em public/config.js (a página de privacidade exige contato)"; fail=1
 fi
+# Login do curso ligado: precisa do projeto configurado e o texto das aulas fora de public/.
+if grep -q 'ENABLED: true' public/config.js; then
+  if grep -A4 'COURSE_AUTH' public/config.js | grep -q 'SUPABASE_URL: ""'; then
+    echo "BLOQUEADO: COURSE_AUTH ligado sem SUPABASE_URL em public/config.js"; fail=1
+  fi
+  if grep -q 'texto: "' public/cursos/aulas.js; then
+    echo "BLOQUEADO: login ligado mas o texto das aulas ainda está em public/cursos/aulas.js (conteúdo trancado vazando)"; fail=1
+  fi
+fi
 [ $fail -eq 0 ] && echo "check.sh OK" || exit 1
