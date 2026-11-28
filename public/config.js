@@ -18,6 +18,11 @@ window.CONFIG = {
   // false = esconde a vitrine (enquanto os produtos abaixo são só exemplos).
   SHOW_SHOWCASE: false,
 
+  // Minicurso (home): aulas que são da versão PAGA. Aparecem com cadeado e "Me avise"
+  // (interesse "aulas-pagas") enquanto não houver preço/checkout. Títulos e durações vêm
+  // de /cursos/aulas.js (mesma fonte do curso).
+  PAID_LESSONS: [4, 5],
+
   CATEGORIES: [
     { id: "skills", label: "Skills de IA" },
     { id: "cursos", label: "Mini-cursos" },
